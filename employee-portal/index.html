@@ -46,22 +46,45 @@
     
     .login-box {
       background: white;
-      padding: 40px;
+      padding: 80px 40px 40px; /* Top padding badhayi logo ke liye */
+      margin-top: 60px; /* White card ko thoda neeche shift karne ke liye */
       border-radius: 20px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       width: 100%;
       max-width: 400px;
+      position: relative; /* Floating logo ke liye */
     }
     
+    /* FLOATING LOGO STYLES */
+    .logo-container {
+      position: absolute;
+      top: -80px; 
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .logo {
+      width: 240px; 
+      height: auto;
+      display: block;
+
+      /* 3D Tilt */
+      transform: perspective(900px) rotateX(12deg) rotateY(-10deg) scale(1.05);
+
+      /* HD Look */
+      image-rendering: -webkit-optimize-contrast;
+
+      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.35));
+      transition: all 0.4s ease;
+    }
+
+    .logo:hover {
+      transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.1);
+    }
+
     .login-logo {
       text-align: center;
       margin-bottom: 30px;
-    }
-    
-    .login-logo img {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
     }
     
     .login-logo h1 {
@@ -588,11 +611,14 @@
   </style>
 </head>
 <body>
-  <!-- Login Page -->
   <div class="login-container" id="loginPage">
     <div class="login-box">
+
+      <div class="logo-container">
+        <img src="punchbook_logo.png" alt="Punch Book" class="logo">
+      </div>
+
       <div class="login-logo">
-        <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-0S0kLLRWepAS6r3fJd11hmJ9cJF7xZ.png" alt="Punch Book">
         <h1>Punch Book</h1>
         <p>Employee Self-Service Portal</p>
       </div>
@@ -612,13 +638,11 @@
     </div>
   </div>
 
-  <!-- App Container -->
   <div class="app-container" id="appContainer">
-    <!-- Header -->
     <header class="app-header">
       <div class="header-content">
         <div class="header-logo">
-          <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-0S0kLLRWepAS6r3fJd11hmJ9cJF7xZ.png" alt="Punch Book">
+          <img src="punchbook_logo.png" alt="Punch Book">
           <h1>Punch Book</h1>
         </div>
         <div class="header-user">
@@ -631,9 +655,7 @@
       </div>
     </header>
 
-    <!-- Main Content -->
     <main class="main-content">
-      <!-- Tabs -->
       <div class="tabs">
         <button class="tab-btn active" data-tab="dashboard">
           <i class="fas fa-home"></i> Dashboard
@@ -649,9 +671,7 @@
         </button>
       </div>
 
-      <!-- Dashboard Tab -->
       <div class="tab-content active" id="dashboardTab">
-        <!-- Today's Status -->
         <div class="today-status">
           <h3><i class="fas fa-clock"></i> Today's Status - <span id="todayDate"></span></h3>
           <div class="today-grid">
@@ -671,7 +691,6 @@
           <span class="today-badge" id="todayBadge">Not Punched</span>
         </div>
 
-        <!-- Quick Stats -->
         <div class="stats-section">
           <div class="stats-header">
             <h3>This Month Summary</h3>
@@ -695,7 +714,6 @@
             </div>
           </div>
 
-          <!-- Recent Activity -->
           <h4 style="margin-bottom: 16px; color: var(--gray-700);">Recent Activity</h4>
           <div class="attendance-table">
             <table>
@@ -716,14 +734,12 @@
         </div>
       </div>
 
-      <!-- Attendance Tab -->
       <div class="tab-content" id="attendanceTab">
         <div class="stats-section">
           <div class="stats-header">
             <h3>Attendance History</h3>
             <select class="month-selector" id="monthSelector" onchange="loadAttendance()">
-              <!-- Populated dynamically -->
-            </select>
+              </select>
           </div>
           
           <div class="stats-grid" id="monthlyStats">
@@ -764,7 +780,6 @@
         </div>
       </div>
 
-      <!-- Profile Tab -->
       <div class="tab-content" id="profileTab">
         <div class="profile-section">
           <div class="profile-header">
@@ -805,7 +820,6 @@
         </div>
       </div>
 
-      <!-- Settings Tab -->
       <div class="tab-content" id="settingsTab">
         <div class="settings-section">
           <h3>Change Password</h3>
@@ -831,7 +845,6 @@
     </main>
   </div>
 
-  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
   <script>
