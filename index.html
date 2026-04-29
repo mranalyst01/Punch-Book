@@ -33,7 +33,7 @@
         .card {
             background-color: #ffffff;
             border-radius: 20px;
-            padding: 80px 30px 40px;
+            padding: 100px 30px 40px; /* Thoda top padding badhaya hai bade icon ke liye */
             width: 100%;
             max-width: 400px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
@@ -44,23 +44,18 @@
         /* FLOATING LOGO */
         .logo-container {
             position: absolute;
-            top: -70px;
+            top: -100px; /* Bada icon properly fit ho isliye top thoda adjust kiya hai */
             left: 50%;
             transform: translateX(-50%);
         }
 
         .logo-wrapper {
             background: transparent;
-            padding: 10px;
-            border-radius: 20px;
-
-            box-shadow: 
-                0 25px 50px rgba(0,0,0,0.25),
-                0 10px 20px rgba(0,0,0,0.15);
+            /* Wrapper ka shadow aur padding hata diya gaya hai */
         }
 
         .logo {
-            width: 150px;
+            width: 220px; /* Size badha diya hai */
             height: auto;
             display: block;
 
@@ -176,7 +171,6 @@
 
 <body>
 
-    <!-- LOADER -->
     <div id="loader-overlay">
         <div class="card-container">
             <div class="card">
@@ -189,11 +183,9 @@
         </div>
     </div>
 
-    <!-- MAIN CARD -->
     <div class="card-container">
         <div class="card">
 
-            <!-- 3D FLOATING LOGO -->
             <div class="logo-container">
                 <div class="logo-wrapper">
                     <img src="punchbook_logo.png" class="logo">
