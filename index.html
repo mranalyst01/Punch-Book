@@ -23,51 +23,15 @@
             overflow: hidden;
         }
 
-        /* Loading Overlay Styling */
-        #loader-overlay {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 9999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: #1a1a1a;
-            font-weight: 500;
-            font-size: 16px;
-        }
-
-        /* Existing Styles */
-        .login-container {
+        /* Original Card Styling (Used for both Login and Loader) */
+        .card-container {
             width: 100%;
             display: flex;
             justify-content: center;
             padding: 20px;
         }
 
-        .login-card {
+        .card {
             background-color: #ffffff;
             border-radius: 12px;
             padding: 40px 30px;
@@ -77,6 +41,59 @@
             text-align: center;
         }
 
+        /* Loader specific styling */
+        #loader-overlay {
+            display: none; /* Default hidden */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2b589b 0%, #3a82f6 100%); /* Matching site background */
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f1f5f9;
+            border-top: 5px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .timer-text {
+            font-size: 14px;
+            color: #666;
+            background: #f1f5f9;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        #countdown-number {
+            color: #e11d48; /* Highlight the seconds */
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* Elements inside login card */
         .logo-container { margin-bottom: 15px; }
         .logo { width: 80px; height: auto; border-radius: 8px; }
         .app-title { font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 5px; }
@@ -108,13 +125,19 @@
 <body>
 
     <div id="loader-overlay">
-        <div class="spinner"></div>
-        <p id="loading-message" class="loading-text">Connecting... Please wait</p>
-        <p style="font-size: 12px; color: #666; margin-top: 5px;">Securing connection (10s)</p>
+        <div class="card-container">
+            <div class="card">
+                <div class="spinner"></div>
+                <p id="loading-message" class="loading-text">Connecting...</p>
+                <div class="timer-text">
+                    Redirecting in <span id="countdown-number">10</span> seconds
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="login-container">
-        <div class="login-card">
+    <div class="card-container">
+        <div class="card">
             <div class="logo-container"> 
                 <img src="punchbook_logo.png" alt="Punch Book Logo" class="logo">
             </div>
@@ -138,24 +161,35 @@
 
     <script>
         function handleNavigation(portalType) {
-            // 1. Text ko update karo jis button pe click kiya hai uske hisaab se
-            document.getElementById('loading-message').innerText = `Connecting to ${portalType} Portal... Please wait`;
+            // Text update
+            document.getElementById('loading-message').innerText = `Connecting to ${portalType} Portal`;
             
-            // 2. Loader ko dikhao
+            // Show Loader Overlay
             document.getElementById('loader-overlay').style.display = 'flex';
             
-            // 3. 10 second (10000 ms) ka timer lagao
-            setTimeout(function() {
-                if (portalType === 'Admin') {
-                    window.location.href = 'https://mranalyst01.github.io/Punch-Book/admin/';
-                } else if (portalType === 'Employee') {
-                    // Yahan Employee portal ka real link daal dena jab ready ho jaye
-                    window.location.href = '#employee-link-here'; 
-                } else if (portalType === 'Employee Punch') {
-                    // Yahan Punch portal ka real link daal dena jab ready ho jaye
-                    window.location.href = '#punch-link-here'; 
+            let timeLeft = 10;
+            let countdownElement = document.getElementById('countdown-number');
+            countdownElement.innerText = timeLeft;
+
+            // Timer logic - har second number update hoga
+            let timer = setInterval(function() {
+                timeLeft--;
+                countdownElement.innerText = timeLeft;
+
+                // Jab timer 0 ho jaye
+                if (timeLeft <= 0) {
+                    clearInterval(timer); // Timer roko
+                    
+                    // Sahi link par redirect karo
+                    if (portalType === 'Admin') {
+                        window.location.href = 'https://mranalyst01.github.io/Punch-Book/admin/';
+                    } else if (portalType === 'Employee') {
+                        window.location.href = 'https://mranalyst01.github.io/Punch-Book/employee-portal/'; 
+                    } else if (portalType === 'Employee Punch') {
+                        window.location.href = 'https://mranalyst01.github.io/Punch-Book/employee-punch/'; 
+                    }
                 }
-            }, 10000); 
+            }, 1000); // 1000 ms = 1 second
         }
     </script>
 
