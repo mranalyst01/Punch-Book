@@ -33,7 +33,9 @@
         .card {
             background-color: #ffffff;
             border-radius: 20px;
-            padding: 100px 30px 40px; /* Thoda top padding badhaya hai bade icon ke liye */
+            /* Top padding 110px se 80px kar di hai taaki text upar aa jaye aur gap kam ho */
+            padding: 80px 30px 40px; 
+            margin-top: 60px;
             width: 100%;
             max-width: 400px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
@@ -44,18 +46,17 @@
         /* FLOATING LOGO */
         .logo-container {
             position: absolute;
-            top: -100px; /* Bada icon properly fit ho isliye top thoda adjust kiya hai */
+            top: -80px; 
             left: 50%;
             transform: translateX(-50%);
         }
 
         .logo-wrapper {
             background: transparent;
-            /* Wrapper ka shadow aur padding hata diya gaya hai */
         }
 
         .logo {
-            width: 220px; /* Size badha diya hai */
+            width: 240px; 
             height: auto;
             display: block;
 
