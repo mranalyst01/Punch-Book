@@ -44,8 +44,9 @@
         }
 
         .logo {
-            width: 60px; /* Aap apne logo ke hisaab se size adjust kar sakte hain */
+            width: 80px; 
             height: auto;
+            border-radius: 8px; 
         }
 
         .app-title {
@@ -82,7 +83,6 @@
             gap: 8px;
         }
 
-        /* Primary Button for Admin */
         .btn-primary {
             background-color: #3b82f6; 
             color: #ffffff;
@@ -92,7 +92,6 @@
             background-color: #2563eb;
         }
 
-        /* Secondary Button for Employee Portal */
         .btn-secondary {
             background-color: #f1f5f9;
             color: #334155;
@@ -103,7 +102,6 @@
             background-color: #e2e8f0;
         }
 
-        /* Success/Action Button for Punch */
         .btn-success {
             background-color: #10b981; 
             color: #ffffff;
@@ -130,18 +128,31 @@
             <p class="subtitle">Select a portal to continue</p>
 
             <div class="button-group">
-                <button class="btn btn-primary" onclick="location.href='#'">
+                <button class="btn btn-primary" onclick="handleNavigation('Admin')">
                     <i class="icon">⚙️</i> Admin Portal
                 </button>
-                <button class="btn btn-secondary" onclick="location.href='#'">
+                <button class="btn btn-secondary" onclick="handleNavigation('Employee')">
                     <i class="icon">👤</i> Employee Portal
                 </button>
-                <button class="btn btn-success" onclick="location.href='#'">
+                <button class="btn btn-success" onclick="handleNavigation('Punch')">
                     <i class="icon">⏱️</i> Employee Punch
                 </button>
             </div>
         </div>
     </div>
+
+    <script>
+        // JavaScript function to handle button clicks
+        function handleNavigation(portalType) {
+            // Placeholder logic: Alert the user
+            alert(`Redirecting to the ${portalType} system...`);
+            
+            // Future implementation: Redirect to the actual URLs
+            // if (portalType === 'Admin') window.location.href = '/admin-login';
+            // if (portalType === 'Employee') window.location.href = '/employee-login';
+            // if (portalType === 'Punch') window.location.href = '/time-clock';
+        }
+    </script>
 
 </body>
 </html>
