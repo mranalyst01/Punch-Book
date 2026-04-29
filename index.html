@@ -23,7 +23,6 @@
             overflow: hidden;
         }
 
-        /* Card Container */
         .card-container {
             width: 100%;
             display: flex;
@@ -31,17 +30,42 @@
             padding: 20px;
         }
 
+        /* UPDATED CARD */
         .card {
             background-color: #ffffff;
             border-radius: 16px;
-            padding: 40px 30px;
+            padding: 70px 30px 40px;
             width: 100%;
             max-width: 400px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             text-align: center;
+            position: relative;
         }
 
-        /* Loader specific styling */
+        /* FLOATING LOGO */
+        .logo-container {
+            position: absolute;
+            top: -55px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .logo {
+            width: 130px;
+            height: auto;
+            border-radius: 12px;
+
+            /* 3D LOOK */
+            transform: perspective(600px) rotateX(10deg);
+            filter: drop-shadow(0 12px 20px rgba(0,0,0,0.25));
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: perspective(600px) rotateX(0deg) scale(1.05);
+        }
+
+        /* Loader */
         #loader-overlay {
             display: none; 
             position: fixed;
@@ -93,46 +117,47 @@
             font-size: 16px;
         }
 
-        /* Elements inside login card */
-        .logo-container { margin-bottom: 12px; }
-        
-        /* Logo Size Increased */
-        .logo { width: 120px; height: auto; border-radius: 10px; } 
-        
-        .app-title { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
-        .subtitle { font-size: 14px; color: #64748b; margin-bottom: 30px; }
-        
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
         .button-group { 
             display: flex; 
             flex-direction: column; 
-            gap: 14px; /* Reduced gap slightly for smaller buttons */
+            gap: 14px;
         }
 
-        /* Modern & Sleek Button Styling (Smaller Size) */
         .btn {
             width: 100%;
-            padding: 13px 20px; /* Padding reduced to make it smaller */
-            font-size: 16px; /* Font size adjusted */
+            padding: 13px 20px;
+            font-size: 16px;
             font-weight: 600;
             border: none;
-            border-radius: 8px; /* Softer, modern corners */
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             letter-spacing: 0.3px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Hover pe thoda utha hua feel */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .btn:active {
             transform: translateY(1px);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
-        /* Clean Gradients */
         .btn-primary { 
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: #ffffff; 
@@ -150,6 +175,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div id="loader-overlay">
@@ -166,6 +192,8 @@
 
     <div class="card-container">
         <div class="card">
+
+            <!-- FLOATING LOGO -->
             <div class="logo-container"> 
                 <img src="punchbook_logo.png" alt="Punch Book Logo" class="logo">
             </div>
@@ -206,9 +234,9 @@
                     if (portalType === 'Admin') {
                         window.location.href = 'https://mranalyst01.github.io/Punch-Book/admin/';
                     } else if (portalType === 'Employee') {
-                        window.location.href = 'https://mranalyst01.github.io/Punch-Book/employee-portal/'; 
+                        window.location.href = 'https://mranalyst01.github.io/Punch-Book/employee-portal/';
                     } else if (portalType === 'Employee Punch') {
-                        window.location.href = 'https://mranalyst01.github.io/Punch-Book/employee-punch/'; 
+                        window.location.href = 'https://mranalyst01.github.io/Punch-Book/employee-punch/';
                     }
                 }
             }, 1000); 
