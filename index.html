@@ -81,6 +81,7 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
+            text-decoration: none; /* Added for anchor tags */
         }
 
         .btn-primary {
@@ -142,15 +143,14 @@
     </div>
 
     <script>
-        // JavaScript function to handle button clicks
         function handleNavigation(portalType) {
-            // Placeholder logic: Alert the user
-            alert(`Redirecting to the ${portalType} system...`);
-            
-            // Future implementation: Redirect to the actual URLs
-            // if (portalType === 'Admin') window.location.href = '/admin-login';
-            // if (portalType === 'Employee') window.location.href = '/employee-login';
-            // if (portalType === 'Punch') window.location.href = '/time-clock';
+            if (portalType === 'Admin') {
+                // Redirect to your specific URL
+                window.location.href = 'https://mranalyst01.github.io/Punch-Book/admin/';
+            } else {
+                // Logic for other buttons
+                alert(`Redirecting to the ${portalType} system...`);
+            }
         }
     </script>
 
