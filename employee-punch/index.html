@@ -180,15 +180,13 @@
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxd3AesxUPpR2ubxWciUPObrjOU7ZKeUvw9FATARaD2Ff8FevUhwy3HfR9cAoKRElIl/exec';
     // ===================================================
 
-    // Global variables
     let videoStream = null;
-    let faceDataList = [];            // loaded from server (includes face descriptors)
-    let recognizedEmployee = null;   // { empId, empName, photoURL, capturedPhoto }
+    let faceDataList = [];
+    let recognizedEmployee = null;
     let currentPunchStatus = null;
     let isProcessing = false;
     let detectionInterval = null;
 
-    // ---------- Apps Script API helpers ----------
     async function callAppsScript(actionData) {
       try {
         const response = await fetch(APPS_SCRIPT_URL, {
@@ -198,19 +196,16 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(actionData)
         });
-        const data = await response.json();
-        return data;
+        return await response.json();
       } catch (error) {
         console.error('API call failed:', error);
         return { success: false, message: 'Network error or server unreachable.' };
       }
     }
 
-    // Fetch all face data (face descriptors) from server
     async function fetchAllFaceData() {
       const result = await callAppsScript({ action: 'getAllFaceData' });
       if (result.success) {
-        // Ensure face descriptors are converted to Float32Array if they come as arrays
         faceDataList = result.faceData.map(emp => ({
           ...emp,
           faceDescriptor: Array.isArray(emp.faceDescriptor) ? new Float32Array(emp.faceDescriptor) : emp.faceDescriptor
@@ -219,37 +214,22 @@
       return result;
     }
 
-    // Fetch employee details by id
     async function fetchEmployeeById(empId) {
       return await callAppsScript({ action: 'getEmployeeById', empId: empId });
     }
 
-    // Fetch today's punch status
     async function fetchTodayPunchStatus(empId) {
       return await callAppsScript({ action: 'getTodayPunchStatus', empId: empId });
     }
 
-    // Punch In request
     async function requestPunchIn(empId, empName, capturedPhoto) {
-      return await callAppsScript({
-        action: 'punchIn',
-        empId: empId,
-        empName: empName,
-        capturedPhoto: capturedPhoto
-      });
+      return await callAppsScript({ action: 'punchIn', empId, empName, capturedPhoto });
     }
 
-    // Punch Out request
     async function requestPunchOut(empId, capturedPhoto) {
-      return await callAppsScript({
-        action: 'punchOut',
-        empId: empId,
-        capturedPhoto: capturedPhoto
-      });
+      return await callAppsScript({ action: 'punchOut', empId, capturedPhoto });
     }
-    // ---------- End of API helpers ----------
 
-    // Original app logic (adapted)
     document.addEventListener('DOMContentLoaded', async function() {
       startClock();
       await initializeFaceRecognition();
@@ -332,14 +312,12 @@
             ctx.lineWidth = 3;
             ctx.strokeRect(box.x, box.y, box.width, box.height);
 
-            // ---- REAL FACE MATCHING ----
             const matchedEmployee = findMatchingEmployee(detection.descriptor);
             if (matchedEmployee) {
               isProcessing = true;
               clearInterval(detectionInterval);
-              recognizedEmployee = { ...matchedEmployee }; // store matched employee data
+              recognizedEmployee = { ...matchedEmployee };
               updateStatus('success', '<i class="fas fa-check-circle"></i> Recognized: ' + matchedEmployee.empName);
-              // Capture photo from video
               const tempCanvas = document.createElement('canvas');
               tempCanvas.width = video.videoWidth;
               tempCanvas.height = video.videoHeight;
@@ -354,10 +332,9 @@
       }, 300);
     }
 
-    // Face matching against loaded descriptors
     function findMatchingEmployee(detectedDescriptor) {
       let bestMatch = null;
-      let bestDistance = 0.6; // threshold
+      let bestDistance = 0.6;
       for (const faceData of faceDataList) {
         const distance = faceapi.euclideanDistance(detectedDescriptor, faceData.faceDescriptor);
         if (distance < bestDistance) {
@@ -374,16 +351,13 @@
       document.getElementById('employeeName').textContent = employee.empName;
       document.getElementById('employeeIdDisplay').textContent = employee.empId;
 
-      // Fetch employee details from server
       const empResult = await fetchEmployeeById(employee.empId);
       if (empResult.success && empResult.employee) {
-        document.getElementById('employeeDept').textContent = 
-          empResult.employee.department + ' - ' + empResult.employee.designation;
+        document.getElementById('employeeDept').textContent = empResult.employee.department + ' - ' + empResult.employee.designation;
       } else {
         document.getElementById('employeeDept').textContent = 'Unknown';
       }
 
-      // Fetch today's punch status
       const status = await fetchTodayPunchStatus(employee.empId);
       currentPunchStatus = status;
       if (status.success) {
