@@ -310,6 +310,7 @@
             clearInterval(detectionInterval);
             recognizedEmployee = { empId: match.empId, empName: match.empName, photoURL: match.photoURL };
 
+            playRecognitionSound(); // 🔔 Chime sound
             updateStatus('success', '<i class="fas fa-check-circle"></i> Recognized: ' + match.empName);
 
             // Capture snapshot from camera
@@ -329,6 +330,38 @@
         }
       } catch (e) { /* ignore transient detection errors */ }
     }, 300);
+  }
+
+  // ============================================================
+  //  Notification Sound — Web Audio API (no external file needed)
+  // ============================================================
+  function playRecognitionSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // 3 notes ka pleasant chime: Do → Mi → Sol
+      const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+      notes.forEach((freq, i) => {
+        const osc     = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+        const start = ctx.currentTime + i * 0.13;
+        const end   = start + 0.18;
+
+        gainNode.gain.setValueAtTime(0, start);
+        gainNode.gain.linearRampToValueAtTime(0.4, start + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, end);
+
+        osc.start(start);
+        osc.stop(end);
+      });
+    } catch(e) { /* silent fail if browser blocks audio */ }
   }
 
   // Euclidean distance matching (threshold 0.55 — tighten if false positives occur)
