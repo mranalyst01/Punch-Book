@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -46,13 +46,13 @@
     
     .login-box {
       background: white;
-      padding: 80px 40px 40px; /* Top padding badhayi logo ke liye */
-      margin-top: 60px; /* White card ko thoda neeche shift karne ke liye */
+      padding: 80px 40px 40px; 
+      margin-top: 60px; 
       border-radius: 20px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       width: 100%;
       max-width: 400px;
-      position: relative; /* Floating logo ke liye */
+      position: relative; 
     }
     
     /* FLOATING LOGO STYLES */
@@ -613,11 +613,9 @@
 <body>
   <div class="login-container" id="loginPage">
     <div class="login-box">
-
       <div class="logo-container">
         <img src="punchbook_logo.png" alt="Punch Book" class="logo">
       </div>
-
       <div class="login-logo">
         <h1>Punch Book</h1>
         <p>Employee Self-Service Portal</p>
@@ -848,25 +846,54 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    // ============ GLOBAL VARIABLES ============
+    // ============================================================
+    // ⚠️ YAHAN APNE EMPLOYEE PORTAL WALE APPS SCRIPT KI URL DAALEIN
+    // ============================================================
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxPxRUqdubBd2xkGH1vSMq7tDzN1Zg_ABdY88etLy0f1KMKwCmas7to_XbI7WrpwHsk/exec'; 
+    // ============================================================
+
     let currentEmployee = null;
+
+    // ============ API HELPER ============
+    async function apiCall(params) {
+      try {
+        let response;
+        
+        // Bada data (jaise password change POST) bhejne ke liye POST method
+        if (params.action === 'changePassword') {
+          response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(params).toString()
+          });
+        } else {
+          // Baki sab GET requests
+          const url = new URL(API_URL);
+          Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+          response = await fetch(url.toString());
+        }
+        
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('API Error:', error);
+        return { success: false, message: 'Network error: ' + error.message };
+      }
+    }
 
     // ============ INITIALIZATION ============
     document.addEventListener('DOMContentLoaded', function() {
-      // Check if already logged in
       const savedEmployee = sessionStorage.getItem('punchbook_employee');
       if (savedEmployee) {
         currentEmployee = JSON.parse(savedEmployee);
         showApp();
       }
 
-      // Setup login form
       document.getElementById('loginForm').addEventListener('submit', handleLogin);
-
-      // Setup password form
       document.getElementById('passwordForm').addEventListener('submit', handlePasswordChange);
 
-      // Setup tabs
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           const tab = this.dataset.tab;
@@ -876,28 +903,23 @@
     });
 
     // ============ AUTHENTICATION ============
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
       const empId = document.getElementById('loginEmpId').value.trim();
       const password = document.getElementById('loginPassword').value;
 
       showToast('Logging in...', '');
       
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            currentEmployee = result.employee;
-            sessionStorage.setItem('punchbook_employee', JSON.stringify(currentEmployee));
-            showApp();
-            showToast('Welcome back, ' + currentEmployee.name + '!', 'success');
-          } else {
-            showToast(result.message, 'error');
-          }
-        })
-        .withFailureHandler(function(error) {
-          showToast('Login failed: ' + error.message, 'error');
-        })
-        .employeeLogin(empId, password);
+      const result = await apiCall({ action: 'employeeLogin', empId: empId, password: password });
+      
+      if (result.success) {
+        currentEmployee = result.employee;
+        sessionStorage.setItem('punchbook_employee', JSON.stringify(currentEmployee));
+        showApp();
+        showToast('Welcome back, ' + currentEmployee.name + '!', 'success');
+      } else {
+        showToast(result.message, 'error');
+      }
     }
 
     function logout() {
@@ -911,10 +933,8 @@
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('appContainer').style.display = 'block';
       
-      // Set header info
       document.getElementById('headerName').textContent = currentEmployee.name;
       
-      // Load data
       loadTodayStatus();
       loadProfile();
       loadMonthSelector();
@@ -935,7 +955,7 @@
     }
 
     // ============ TODAY'S STATUS ============
-    function loadTodayStatus() {
+    async function loadTodayStatus() {
       document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN', {
         weekday: 'long',
         day: '2-digit',
@@ -943,80 +963,77 @@
         year: 'numeric'
       });
 
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            document.getElementById('todayPunchIn').textContent = result.punchIn || '--:--';
-            document.getElementById('todayPunchOut').textContent = result.punchOut || '--:--';
-            document.getElementById('todayHours').textContent = result.workHours ? result.workHours + ' hrs' : '--';
-            
-            const badge = document.getElementById('todayBadge');
-            badge.textContent = result.status;
-            badge.className = 'today-badge';
-            if (result.status === 'Present') badge.classList.add('success');
-            else if (result.status === 'Late') badge.classList.add('warning');
-          }
-        })
-        .getTodayStatus(currentEmployee.empId);
+      const result = await apiCall({ action: 'getTodayStatus', empId: currentEmployee.empId });
+      
+      if (result.success) {
+        document.getElementById('todayPunchIn').textContent = result.punchIn || '--:--';
+        document.getElementById('todayPunchOut').textContent = result.punchOut || '--:--';
+        document.getElementById('todayHours').textContent = result.workHours ? result.workHours + ' hrs' : '--';
+        
+        const badge = document.getElementById('todayBadge');
+        badge.textContent = result.status;
+        badge.className = 'today-badge';
+        if (result.status === 'Present') badge.classList.add('success');
+        else if (result.status === 'Late') badge.classList.add('warning');
+      }
 
       // Load this month's quick stats
       const now = new Date();
       const month = now.getMonth() + 1;
       const year = now.getFullYear();
 
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            document.getElementById('quickPresent').textContent = result.summary.presentDays;
-            document.getElementById('quickAbsent').textContent = result.summary.absentDays;
-            document.getElementById('quickLate').textContent = result.summary.lateDays;
-            document.getElementById('quickPercent').textContent = result.summary.attendancePercent + '%';
-          }
-        })
-        .getAttendanceSummary(currentEmployee.empId, month, year);
+      const summaryResult = await apiCall({ 
+        action: 'getAttendanceSummary', 
+        empId: currentEmployee.empId, 
+        month: month, 
+        year: year 
+      });
+
+      if (summaryResult.success) {
+        document.getElementById('quickPresent').textContent = summaryResult.summary.presentDays;
+        document.getElementById('quickAbsent').textContent = summaryResult.summary.absentDays;
+        document.getElementById('quickLate').textContent = summaryResult.summary.lateDays;
+        document.getElementById('quickPercent').textContent = summaryResult.summary.attendancePercent + '%';
+      }
     }
 
     // ============ PROFILE ============
-    function loadProfile() {
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            const emp = result.employee;
-            const photoURL = result.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(emp.name) + '&size=200';
-            
-            document.getElementById('headerAvatar').src = photoURL;
-            document.getElementById('profileAvatar').src = photoURL;
-            document.getElementById('profileName').textContent = emp.name;
-            document.getElementById('profileEmpId').textContent = emp.empId;
-            document.getElementById('profileDept').textContent = emp.department;
-            document.getElementById('profileEmail').textContent = emp.email;
-            document.getElementById('profilePhone').textContent = emp.phone || 'Not set';
-            document.getElementById('profileDesignation').textContent = emp.designation;
-            document.getElementById('profileJoinDate').textContent = formatDate(emp.joinDate);
-            document.getElementById('profileStatus').textContent = emp.status;
-            document.getElementById('profileFace').textContent = result.hasPhoto ? 'Yes' : 'No';
-          }
-        })
-        .getEmployeeProfile(currentEmployee.empId);
+    async function loadProfile() {
+      const result = await apiCall({ action: 'getEmployeeProfile', empId: currentEmployee.empId });
+      
+      if (result.success) {
+        const emp = result.employee;
+        const photoURL = result.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(emp.name) + '&size=200';
+        
+        document.getElementById('headerAvatar').src = photoURL;
+        document.getElementById('profileAvatar').src = photoURL;
+        document.getElementById('profileName').textContent = emp.name;
+        document.getElementById('profileEmpId').textContent = emp.empId;
+        document.getElementById('profileDept').textContent = emp.department;
+        document.getElementById('profileEmail').textContent = emp.email;
+        document.getElementById('profilePhone').textContent = emp.phone || 'Not set';
+        document.getElementById('profileDesignation').textContent = emp.designation;
+        document.getElementById('profileJoinDate').textContent = formatDate(emp.joinDate);
+        document.getElementById('profileStatus').textContent = emp.status;
+        document.getElementById('profileFace').textContent = result.hasPhoto ? 'Yes' : 'No';
+      }
     }
 
     // ============ ATTENDANCE ============
-    function loadMonthSelector() {
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            const select = document.getElementById('monthSelector');
-            select.innerHTML = result.months.map(m => 
-              `<option value="${m.value}">${m.label}</option>`
-            ).join('');
-            
-            loadAttendance();
-          }
-        })
-        .getAvailableMonths();
+    async function loadMonthSelector() {
+      const result = await apiCall({ action: 'getAvailableMonths' });
+      
+      if (result.success) {
+        const select = document.getElementById('monthSelector');
+        select.innerHTML = result.months.map(m => 
+          `<option value="${m.value}">${m.label}</option>`
+        ).join('');
+        
+        loadAttendance();
+      }
     }
 
-    function loadAttendance() {
+    async function loadAttendance() {
       const monthValue = document.getElementById('monthSelector').value;
       if (!monthValue) return;
       
@@ -1024,30 +1041,31 @@
       
       document.getElementById('attendanceTable').innerHTML = '<tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>';
 
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            // Update stats
-            document.getElementById('monthPresent').textContent = result.summary.presentDays;
-            document.getElementById('monthAbsent').textContent = result.summary.absentDays;
-            document.getElementById('monthLate').textContent = result.summary.lateDays;
-            document.getElementById('monthHours').textContent = result.summary.totalHours;
-            
-            // Update table
-            renderAttendanceTable(result.records, 'attendanceTable');
-          }
-        })
-        .getAttendanceSummary(currentEmployee.empId, parseInt(month), parseInt(year));
+      const result = await apiCall({ 
+        action: 'getAttendanceSummary', 
+        empId: currentEmployee.empId, 
+        month: parseInt(month), 
+        year: parseInt(year) 
+      });
+
+      if (result.success) {
+        // Update stats
+        document.getElementById('monthPresent').textContent = result.summary.presentDays;
+        document.getElementById('monthAbsent').textContent = result.summary.absentDays;
+        document.getElementById('monthLate').textContent = result.summary.lateDays;
+        document.getElementById('monthHours').textContent = result.summary.totalHours;
+        
+        // Update table
+        renderAttendanceTable(result.records, 'attendanceTable');
+      }
     }
 
-    function loadRecentActivity() {
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            renderAttendanceTable(result.records, 'recentActivityTable');
-          }
-        })
-        .getRecentActivity(currentEmployee.empId, 5);
+    async function loadRecentActivity() {
+      const result = await apiCall({ action: 'getRecentActivity', empId: currentEmployee.empId, limit: 5 });
+      
+      if (result.success) {
+        renderAttendanceTable(result.records, 'recentActivityTable');
+      }
     }
 
     function renderAttendanceTable(records, tableId) {
@@ -1070,7 +1088,7 @@
     }
 
     // ============ SETTINGS ============
-    function handlePasswordChange(e) {
+    async function handlePasswordChange(e) {
       e.preventDefault();
       
       const currentPassword = document.getElementById('currentPassword').value;
@@ -1087,16 +1105,19 @@
         return;
       }
       
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            showToast(result.message, 'success');
-            document.getElementById('passwordForm').reset();
-          } else {
-            showToast(result.message, 'error');
-          }
-        })
-        .changePassword(currentEmployee.empId, currentPassword, newPassword);
+      const result = await apiCall({ 
+        action: 'changePassword', 
+        empId: currentEmployee.empId, 
+        currentPassword: currentPassword, 
+        newPassword: newPassword 
+      });
+
+      if (result.success) {
+        showToast(result.message, 'success');
+        document.getElementById('passwordForm').reset();
+      } else {
+        showToast(result.message, 'error');
+      }
     }
 
     // ============ HELPERS ============
