@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   
-  <!-- GitHub / NPM Face API is loaded from CDN here automatically -->
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   
   <style>
@@ -112,7 +111,6 @@
 <body>
   <div class="punch-container">
     <div class="logo-container">
-      <!-- Make sure 'punchbook_logo.png' is hosted somewhere or replace with your logo URL -->
       <img src="https://via.placeholder.com/240x80?text=Punch+Book" alt="Punch Book" class="logo">
     </div>
     <div class="punch-header">
@@ -180,6 +178,22 @@
   </div>
 
   <script>
+    // ============ YOUR APPS SCRIPT WEB APP LINK ============
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxd3AesxUPpR2ubxWciUPObrjOU7ZKeUvw9FATARaD2Ff8FevUhwy3HfR9cAoKRElIl/exec';
+
+    // Helper function to connect to Google Apps Script Backend from GitHub
+    async function apiCall(action, payload = {}) {
+      try {
+        const response = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: action, ...payload })
+        });
+        return await response.json();
+      } catch (error) {
+        return { success: false, message: error.toString() };
+      }
+    }
+
     let videoStream = null;
     let faceDataList = [];
     let recognizedEmployee = null;
@@ -210,7 +224,6 @@
     async function initializeFaceRecognition() {
       try {
         updateStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Loading face recognition model...');
-        // Models fetched via CDN
         const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model';
         
         await Promise.all([
@@ -219,23 +232,20 @@
           faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
         ]);
         
-        updateStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Loading employee data from Server...');
+        updateStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Connecting to Server...');
         
-        // REAL API CALL: Fetch face data from Google Sheets
-        google.script.run.withSuccessHandler(function(result) {
-          if (result.success) {
-            // Convert Array/Object descriptors to Float32Array for face-api
-            faceDataList = result.faceData.map(data => ({
-              ...data,
-              faceDescriptor: new Float32Array(Object.values(data.faceDescriptor))
-            }));
-            startCamera();
-          } else {
-            updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
-          }
-        }).withFailureHandler(function(error) {
-           updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> Server Error: ' + error.message);
-        }).getAllFaceData();
+        // GITHUB API CALL: Fetch face data
+        const result = await apiCall('getAllFaceData');
+        
+        if (result.success) {
+          faceDataList = result.faceData.map(data => ({
+            ...data,
+            faceDescriptor: new Float32Array(Object.values(data.faceDescriptor))
+          }));
+          startCamera();
+        } else {
+          updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> Data load failed: ' + result.message);
+        }
 
       } catch (error) {
         updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> Failed to load: ' + error.message);
@@ -282,7 +292,6 @@
             ctx.lineWidth = 3;
             ctx.strokeRect(box.x, box.y, box.width, box.height);
 
-            // REAL MATCHING ALGORITHM
             const matchedEmployee = findMatchingEmployee(detection.descriptor);
             
             if (matchedEmployee) {
@@ -291,7 +300,6 @@
               recognizedEmployee = matchedEmployee;
               updateStatus('success', '<i class="fas fa-check-circle"></i> Recognized: ' + matchedEmployee.empName);
               
-              // Capture photo from video for proof
               const tempCanvas = document.createElement('canvas');
               tempCanvas.width = video.videoWidth;
               tempCanvas.height = video.videoHeight;
@@ -307,12 +315,11 @@
       }, 300);
     }
 
-    // Matching detected face with Google Sheets Face Data
     function findMatchingEmployee(detectedDescriptor) {
       if (faceDataList.length === 0) return null;
       
       let bestMatch = null;
-      let bestDistance = 0.50; // Threshold distance (lower means stricter match)
+      let bestDistance = 0.50; 
       
       for (const faceData of faceDataList) {
         const distance = faceapi.euclideanDistance(detectedDescriptor, faceData.faceDescriptor);
@@ -331,17 +338,17 @@
       document.getElementById('employeeIdDisplay').textContent = employee.empId;
       document.getElementById('employeeDept').textContent = 'Loading details...';
       
-      // REAL API CALL: Get Employee Details
-      google.script.run.withSuccessHandler(function(result) {
+      // GITHUB API CALL: Get Employee Details
+      apiCall('getEmployeeById', { empId: employee.empId }).then(result => {
         if (result.success) {
           document.getElementById('employeeDept').textContent = result.employee.department + ' - ' + result.employee.designation;
         } else {
           document.getElementById('employeeDept').textContent = 'Unknown Department';
         }
-      }).getEmployeeById(employee.empId);
+      });
 
-      // REAL API CALL: Get Today's Punch Status
-      google.script.run.withSuccessHandler(function(status) {
+      // GITHUB API CALL: Get Today's Punch Status
+      apiCall('getTodayPunchStatus', { empId: employee.empId }).then(status => {
         currentPunchStatus = status;
         if (status.success) {
           if (status.hasPunchedIn) {
@@ -363,43 +370,50 @@
             document.getElementById('btnPunchOut').disabled = true;
           }
         }
-      }).getTodayPunchStatus(employee.empId);
+      });
 
       document.getElementById('employeeCard').classList.add('show');
     }
 
-    function doPunchIn() {
+    async function doPunchIn() {
       const btn = document.getElementById('btnPunchIn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Processing...';
       
-      // REAL API CALL: Punch In
-      google.script.run.withSuccessHandler(function(result) {
-        if (result.success) {
-          showSuccess('Punch In Successful!', result.time, 'Status: ' + result.status);
-        } else {
-          updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Punch In';
-        }
-      }).punchIn(recognizedEmployee.empId, recognizedEmployee.empName, recognizedEmployee.capturedPhoto);
+      // GITHUB API CALL: Punch In
+      const result = await apiCall('punchIn', {
+        empId: recognizedEmployee.empId,
+        empName: recognizedEmployee.empName,
+        photoBase64: recognizedEmployee.capturedPhoto
+      });
+
+      if (result.success) {
+        showSuccess('Punch In Successful!', result.time, 'Status: ' + result.status);
+      } else {
+        updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Punch In';
+      }
     }
 
-    function doPunchOut() {
+    async function doPunchOut() {
       const btn = document.getElementById('btnPunchOut');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Processing...';
       
-      // REAL API CALL: Punch Out
-      google.script.run.withSuccessHandler(function(result) {
-        if (result.success) {
-          showSuccess('Punch Out Successful!', result.time, 'Total hours: ' + result.workHours + ' hrs');
-        } else {
-          updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Punch Out';
-        }
-      }).punchOut(recognizedEmployee.empId, recognizedEmployee.capturedPhoto);
+      // GITHUB API CALL: Punch Out
+      const result = await apiCall('punchOut', {
+        empId: recognizedEmployee.empId,
+        photoBase64: recognizedEmployee.capturedPhoto
+      });
+
+      if (result.success) {
+        showSuccess('Punch Out Successful!', result.time, 'Total hours: ' + result.workHours + ' hrs');
+      } else {
+        updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Punch Out';
+      }
     }
 
     function showSuccess(text, time, details) {
@@ -418,8 +432,7 @@
       document.getElementById('employeeCard').classList.remove('show');
       document.getElementById('cameraSection').classList.remove('hidden');
       
-      // Reset text
-      document.getElementById('btnPunchIn').disabled = true; // Wait for API response
+      document.getElementById('btnPunchIn').disabled = true;
       document.getElementById('btnPunchIn').innerHTML = '<i class="fas fa-sign-in-alt"></i> Punch In';
       document.getElementById('btnPunchOut').disabled = true;
       document.getElementById('btnPunchOut').innerHTML = '<i class="fas fa-sign-out-alt"></i> Punch Out';
