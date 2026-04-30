@@ -6,7 +6,10 @@
   <title>Punch Book - Punch In/Out</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- GitHub / NPM Face API is loaded from CDN here automatically -->
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -109,7 +112,8 @@
 <body>
   <div class="punch-container">
     <div class="logo-container">
-      <img src="punchbook_logo.png" alt="Punch Book" class="logo">
+      <!-- Make sure 'punchbook_logo.png' is hosted somewhere or replace with your logo URL -->
+      <img src="https://via.placeholder.com/240x80?text=Punch+Book" alt="Punch Book" class="logo">
     </div>
     <div class="punch-header">
       <h1>Punch Book</h1>
@@ -176,96 +180,6 @@
   </div>
 
   <script>
-    // ---------- SIMULATED BACKEND USING LOCALSTORAGE ----------
-    // Hardcoded demo employee. Replace/remove this demo when using a real backend.
-    const DEMO_EMPLOYEE = {
-      empId: "EMP001",
-      empName: "Demo User",
-      photoURL: "",  // leave empty to show a generated avatar
-      department: "Engineering",
-      designation: "Developer"
-    };
-
-    // All employee data (currently only one). You can expand this array.
-    const EMPLOYEES = [DEMO_EMPLOYEE];
-
-    // Helper: get today's date as YYYY-MM-DD
-    function getTodayKey() {
-      const now = new Date();
-      return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-    }
-
-    // Helper: get storage key for a particular employee's daily punch
-    function getPunchKey(empId) {
-      return 'punch_' + empId + '_' + getTodayKey();
-    }
-
-    // Simulate google.script.run.getAllFaceData() -> returns empty (no actual descriptors to match)
-    // In simulation mode, any detected face is mapped to DEMO_EMPLOYEE.
-    function getAllFaceData() {
-      return { success: true, faceData: [] }; // no stored descriptors needed
-    }
-
-    // Simulate google.script.run.getEmployeeById(empId)
-    function server_getEmployeeById(empId) {
-      const emp = EMPLOYEES.find(e => e.empId === empId);
-      return { success: !!emp, employee: emp };
-    }
-
-    // Simulate google.script.run.getTodayPunchStatus(empId)
-    function server_getTodayPunchStatus(empId) {
-      const record = JSON.parse(localStorage.getItem(getPunchKey(empId)) || '{}');
-      return {
-        success: true,
-        hasPunchedIn: !!record.punchIn,
-        punchIn: record.punchIn || null,
-        hasPunchedOut: !!record.punchOut,
-        punchOut: record.punchOut || null
-      };
-    }
-
-    // Simulate google.script.run.punchIn(empId, empName, capturedPhoto)
-    function server_punchIn(empId, empName, capturedPhoto) {
-      const key = getPunchKey(empId);
-      const record = JSON.parse(localStorage.getItem(key) || '{}');
-      if (record.punchIn) {
-        return { success: false, message: 'Already punched in today.' };
-      }
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('en-IN', { hour12: false });
-      record.punchIn = timeStr;
-      record.empName = empName;
-      record.capturedPhotoIn = capturedPhoto || '';
-      localStorage.setItem(key, JSON.stringify(record));
-      return { success: true, time: timeStr, workHours: null };
-    }
-
-    // Simulate google.script.run.punchOut(empId, capturedPhoto)
-    function server_punchOut(empId, capturedPhoto) {
-      const key = getPunchKey(empId);
-      const record = JSON.parse(localStorage.getItem(key) || '{}');
-      if (!record.punchIn) {
-        return { success: false, message: 'You have not punched in yet.' };
-      }
-      if (record.punchOut) {
-        return { success: false, message: 'Already punched out today.' };
-      }
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('en-IN', { hour12: false });
-      record.punchOut = timeStr;
-      record.capturedPhotoOut = capturedPhoto || '';
-      // calculate work hours
-      const [inH, inM] = record.punchIn.split(':').map(Number);
-      const outH = now.getHours(), outM = now.getMinutes();
-      const diffMin = (outH*60 + outM) - (inH*60 + inM);
-      const hours = (diffMin / 60).toFixed(1);
-      record.workHours = hours;
-      localStorage.setItem(key, JSON.stringify(record));
-      return { success: true, time: timeStr, workHours: hours };
-    }
-    // ---------- END OF SIMULATED BACKEND ----------
-
-    // Original app logic (adapted)
     let videoStream = null;
     let faceDataList = [];
     let recognizedEmployee = null;
@@ -296,21 +210,33 @@
     async function initializeFaceRecognition() {
       try {
         updateStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Loading face recognition model...');
+        // Models fetched via CDN
         const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model';
+        
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
           faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
           faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
         ]);
-        updateStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Loading employee data...');
-        // Use simulated backend call
-        const result = getAllFaceData(); // { success: true, faceData: [] }
-        if (result.success) {
-          faceDataList = result.faceData;
-          startCamera();
-        } else {
-          updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
-        }
+        
+        updateStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Loading employee data from Server...');
+        
+        // REAL API CALL: Fetch face data from Google Sheets
+        google.script.run.withSuccessHandler(function(result) {
+          if (result.success) {
+            // Convert Array/Object descriptors to Float32Array for face-api
+            faceDataList = result.faceData.map(data => ({
+              ...data,
+              faceDescriptor: new Float32Array(Object.values(data.faceDescriptor))
+            }));
+            startCamera();
+          } else {
+            updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
+          }
+        }).withFailureHandler(function(error) {
+           updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> Server Error: ' + error.message);
+        }).getAllFaceData();
+
       } catch (error) {
         updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> Failed to load: ' + error.message);
       }
@@ -338,50 +264,56 @@
     }
 
     function startFaceDetection() {
-      // We no longer require faceDataList to be non-empty because we simulate recognition.
-      // But if you want real matching, you would need to register real descriptors.
       const video = document.getElementById('video');
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
+      
       detectionInterval = setInterval(async () => {
         if (isProcessing) return;
         try {
           const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
             .withFaceLandmarks().withFaceDescriptor();
+            
           ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
           if (detection) {
             const box = detection.detection.box;
             ctx.strokeStyle = '#10B981';
             ctx.lineWidth = 3;
             ctx.strokeRect(box.x, box.y, box.width, box.height);
 
-            // ------- SIMULATION: any face recognised as DEMO_EMPLOYEE -------
-            // If you have real descriptors, use findMatchingEmployee(detection.descriptor)
-            // For demo, we skip matching and just pick the first employee.
-            const matchedEmployee = DEMO_EMPLOYEE; // always recognised as demo user
+            // REAL MATCHING ALGORITHM
+            const matchedEmployee = findMatchingEmployee(detection.descriptor);
+            
             if (matchedEmployee) {
               isProcessing = true;
               clearInterval(detectionInterval);
               recognizedEmployee = matchedEmployee;
               updateStatus('success', '<i class="fas fa-check-circle"></i> Recognized: ' + matchedEmployee.empName);
-              // Capture photo from video
+              
+              // Capture photo from video for proof
               const tempCanvas = document.createElement('canvas');
               tempCanvas.width = video.videoWidth;
               tempCanvas.height = video.videoHeight;
               tempCanvas.getContext('2d').drawImage(video, 0, 0);
               recognizedEmployee.capturedPhoto = tempCanvas.toDataURL('image/jpeg', 0.7);
+              
               setTimeout(() => { showEmployeeCard(matchedEmployee); }, 1000);
             }
           }
-        } catch (e) {}
+        } catch (e) {
+            console.error("Detection Error:", e);
+        }
       }, 300);
     }
 
-    // This function is kept but not used in simulation mode.
-    // Uncomment and use if you switch to real face descriptors.
+    // Matching detected face with Google Sheets Face Data
     function findMatchingEmployee(detectedDescriptor) {
+      if (faceDataList.length === 0) return null;
+      
       let bestMatch = null;
-      let bestDistance = 0.6;
+      let bestDistance = 0.50; // Threshold distance (lower means stricter match)
+      
       for (const faceData of faceDataList) {
         const distance = faceapi.euclideanDistance(detectedDescriptor, faceData.faceDescriptor);
         if (distance < bestDistance) {
@@ -397,37 +329,42 @@
       document.getElementById('employeeAvatar').src = employee.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(employee.empName);
       document.getElementById('employeeName').textContent = employee.empName;
       document.getElementById('employeeIdDisplay').textContent = employee.empId;
-
-      // Fetch employee details from simulated backend
-      const result = server_getEmployeeById(employee.empId);
-      if (result.success) {
-        document.getElementById('employeeDept').textContent = result.employee.department + ' - ' + result.employee.designation;
-      } else {
-        document.getElementById('employeeDept').textContent = 'Unknown';
-      }
-
-      // Fetch today's punch status
-      const status = server_getTodayPunchStatus(employee.empId);
-      currentPunchStatus = status;
-      if (status.success) {
-        if (status.hasPunchedIn) {
-          document.getElementById('todayStatus').textContent = 'Punched In';
-          document.getElementById('todayStatus').className = 'punch-status-value success';
-          document.getElementById('punchInTime').textContent = status.punchIn;
-          document.getElementById('btnPunchIn').disabled = true;
-          if (status.hasPunchedOut) {
-            document.getElementById('todayStatus').textContent = 'Completed';
-            document.getElementById('punchOutTime').textContent = status.punchOut;
-            document.getElementById('btnPunchOut').disabled = true;
-          } else {
-            document.getElementById('btnPunchOut').disabled = false;
-          }
+      document.getElementById('employeeDept').textContent = 'Loading details...';
+      
+      // REAL API CALL: Get Employee Details
+      google.script.run.withSuccessHandler(function(result) {
+        if (result.success) {
+          document.getElementById('employeeDept').textContent = result.employee.department + ' - ' + result.employee.designation;
         } else {
-          document.getElementById('todayStatus').textContent = 'Not Punched';
-          document.getElementById('btnPunchIn').disabled = false;
-          document.getElementById('btnPunchOut').disabled = true;
+          document.getElementById('employeeDept').textContent = 'Unknown Department';
         }
-      }
+      }).getEmployeeById(employee.empId);
+
+      // REAL API CALL: Get Today's Punch Status
+      google.script.run.withSuccessHandler(function(status) {
+        currentPunchStatus = status;
+        if (status.success) {
+          if (status.hasPunchedIn) {
+            document.getElementById('todayStatus').textContent = 'Punched In';
+            document.getElementById('todayStatus').className = 'punch-status-value success';
+            document.getElementById('punchInTime').textContent = status.punchIn;
+            document.getElementById('btnPunchIn').disabled = true;
+            
+            if (status.hasPunchedOut) {
+              document.getElementById('todayStatus').textContent = 'Completed';
+              document.getElementById('punchOutTime').textContent = status.punchOut;
+              document.getElementById('btnPunchOut').disabled = true;
+            } else {
+              document.getElementById('btnPunchOut').disabled = false;
+            }
+          } else {
+            document.getElementById('todayStatus').textContent = 'Not Punched';
+            document.getElementById('btnPunchIn').disabled = false;
+            document.getElementById('btnPunchOut').disabled = true;
+          }
+        }
+      }).getTodayPunchStatus(employee.empId);
+
       document.getElementById('employeeCard').classList.add('show');
     }
 
@@ -435,28 +372,34 @@
       const btn = document.getElementById('btnPunchIn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Processing...';
-      const result = server_punchIn(recognizedEmployee.empId, recognizedEmployee.empName, recognizedEmployee.capturedPhoto);
-      if (result.success) {
-        showSuccess('Punch In Successful!', result.time, 'Have a great day!');
-      } else {
-        updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Punch In';
-      }
+      
+      // REAL API CALL: Punch In
+      google.script.run.withSuccessHandler(function(result) {
+        if (result.success) {
+          showSuccess('Punch In Successful!', result.time, 'Status: ' + result.status);
+        } else {
+          updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Punch In';
+        }
+      }).punchIn(recognizedEmployee.empId, recognizedEmployee.empName, recognizedEmployee.capturedPhoto);
     }
 
     function doPunchOut() {
       const btn = document.getElementById('btnPunchOut');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Processing...';
-      const result = server_punchOut(recognizedEmployee.empId, recognizedEmployee.capturedPhoto);
-      if (result.success) {
-        showSuccess('Punch Out Successful!', result.time, 'Total hours: ' + result.workHours + ' hrs');
-      } else {
-        updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Punch Out';
-      }
+      
+      // REAL API CALL: Punch Out
+      google.script.run.withSuccessHandler(function(result) {
+        if (result.success) {
+          showSuccess('Punch Out Successful!', result.time, 'Total hours: ' + result.workHours + ' hrs');
+        } else {
+          updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Punch Out';
+        }
+      }).punchOut(recognizedEmployee.empId, recognizedEmployee.capturedPhoto);
     }
 
     function showSuccess(text, time, details) {
@@ -474,10 +417,16 @@
       document.getElementById('successAnimation').classList.remove('show');
       document.getElementById('employeeCard').classList.remove('show');
       document.getElementById('cameraSection').classList.remove('hidden');
-      document.getElementById('btnPunchIn').disabled = false;
+      
+      // Reset text
+      document.getElementById('btnPunchIn').disabled = true; // Wait for API response
       document.getElementById('btnPunchIn').innerHTML = '<i class="fas fa-sign-in-alt"></i> Punch In';
-      document.getElementById('btnPunchOut').disabled = false;
+      document.getElementById('btnPunchOut').disabled = true;
       document.getElementById('btnPunchOut').innerHTML = '<i class="fas fa-sign-out-alt"></i> Punch Out';
+      
+      document.getElementById('punchInTime').textContent = '-';
+      document.getElementById('punchOutTime').textContent = '-';
+      
       startFaceDetection();
     }
 
