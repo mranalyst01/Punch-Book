@@ -2,18 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Mobile Friendly Meta Tag: Ye mobile par zoom aur width ko control karta hai -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Punch Book - Employee Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- AI Face Recognition Script -->
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  
   <style>
     /* ================= RESET & VARIABLES ================= */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
     :root {
       --primary: #3B82F6;
@@ -86,286 +85,107 @@
       margin-bottom: 30px;
     }
     
-    .login-logo h1 {
-      color: var(--gray-900);
-      font-size: 24px;
-      margin-top: 12px;
-    }
-    
-    .login-logo p {
-      color: var(--gray-500);
-      font-size: 14px;
-    }
+    .login-logo h1 { color: var(--gray-900); font-size: 24px; margin-top: 12px; }
+    .login-logo p { color: var(--gray-500); font-size: 14px; }
     
     /* ================= FORMS & BUTTONS ================= */
-    .form-group { 
-      margin-bottom: 20px; 
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 6px; color: var(--gray-700); font-weight: 500; font-size: 14px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px 16px; border: 1px solid var(--gray-300); border-radius: 10px; font-size: 14px; transition: all 0.2s;
     }
-    
-    .form-group label {
-      display: block; 
-      margin-bottom: 6px; 
-      color: var(--gray-700); 
-      font-weight: 500; 
-      font-size: 14px;
-    }
-    
-    .form-group input, 
-    .form-group select {
-      width: 100%; 
-      padding: 12px 16px; 
-      border: 1px solid var(--gray-300); 
-      border-radius: 10px; 
-      font-size: 14px; 
-      transition: all 0.2s;
-    }
-    
-    .form-group input:focus, 
-    .form-group select:focus {
-      outline: none; 
-      border-color: var(--primary); 
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
     
     .btn {
-      padding: 12px 24px; 
-      border: none; 
-      border-radius: 10px; 
-      font-size: 14px; 
-      font-weight: 600; 
-      cursor: pointer; 
-      transition: all 0.2s; 
-      display: inline-flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 8px;
+      padding: 12px 24px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
     }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
     
-    .btn-primary { 
-      background: var(--primary); 
-      color: white; 
-      width: 100%; 
-    }
-    
-    .btn-primary:hover { 
-      background: var(--primary-dark); 
-    }
-    
-    .btn-secondary { 
-      background: var(--gray-200); 
-      color: var(--gray-700); 
-    }
-    
-    /* ================= APP LAYOUT ================= */
-    .app-container { 
-      display: none; 
-    }
-    
-    .app-header {
-      background: white; 
-      padding: 16px 24px; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-      position: sticky; 
-      top: 0; 
-      z-index: 100;
-    }
-    
-    .header-content {
-      max-width: 900px; 
-      margin: 0 auto; 
-      display: flex; 
-      justify-content: space-between; 
+    /* --- WEBCAM STYLES --- */
+    #webcam-container {
+      display: none;
+      flex-direction: column;
       align-items: center;
+      margin-top: 15px;
     }
-    
-    .header-logo { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
+    #video {
+      border-radius: 10px;
+      border: 3px solid var(--primary);
+      width: 100%;
+      max-width: 300px;
+      transform: scaleX(-1); /* Mirror effect */
     }
-    
-    .header-logo img {
-      width: 60px; 
-      height: 60px;
-      object-fit: contain;
+    .face-scan-text {
+      font-size: 14px;
+      color: var(--primary);
+      margin-top: 10px;
+      font-weight: 600;
+      animation: pulse 1.5s infinite;
     }
-    
-    .header-logo h1 { 
-      font-size: 18px; 
-      color: var(--gray-900); 
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
     }
-    
-    .header-user { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-    }
-    
-    .user-avatar { 
-      width: 40px; 
-      height: 40px; 
-      border-radius: 50%; 
-      object-fit: cover; 
-      border: 2px solid var(--primary); 
-    }
-    
-    .user-name { 
-      font-weight: 600; 
-      color: var(--gray-900); 
-      font-size: 14px; 
-    }
-    
-    .logout-btn {
-      background: none; 
-      border: none; 
-      color: var(--gray-500); 
-      cursor: pointer; 
-      padding: 8px; 
-      border-radius: 8px; 
-      transition: all 0.2s;
-    }
-    
-    .logout-btn:hover { 
-      background: var(--gray-100); 
-      color: var(--danger); 
-    }
-    
-    .main-content { 
-      max-width: 900px; 
-      margin: 0 auto; 
-      padding: 24px; 
-    }
+    .btn-face { background: var(--purple); color: white; margin-top: 10px; }
+    .btn-face:hover { background: #7C3AED; }
 
-    /* ================= TABS (Mobile Scrollable) ================= */
-    .tabs { 
-      display: flex; 
-      gap: 8px; 
-      margin-bottom: 24px; 
-      border-bottom: 1px solid var(--gray-200); 
-      padding-bottom: 8px; 
-      flex-wrap: nowrap; 
-      overflow-x: auto; 
-      -webkit-overflow-scrolling: touch; 
-      scrollbar-width: none; 
+    /* ================= APP LAYOUT ================= */
+    .app-container { display: none; }
+    .app-header {
+      background: white; padding: 16px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
     }
-    
-    .tabs::-webkit-scrollbar {
-      display: none; 
+    .header-content {
+      max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;
     }
+    .header-logo { display: flex; align-items: center; gap: 12px; }
+    .header-logo img { width: 60px; height: 60px; object-fit: contain; }
+    .header-logo h1 { font-size: 18px; color: var(--gray-900); }
+    .header-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+    .user-name { font-weight: 600; color: var(--gray-900); font-size: 14px; }
+    .logout-btn { background: none; border: none; color: var(--gray-500); cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.2s; }
+    .logout-btn:hover { background: var(--gray-100); color: var(--danger); }
+    .main-content { max-width: 900px; margin: 0 auto; padding: 24px; }
 
-    .tab-btn { 
-      padding: 10px 20px; 
-      border: none; 
-      background: none; 
-      color: var(--gray-500); 
-      font-size: 14px; 
-      font-weight: 500; 
-      cursor: pointer; 
-      border-radius: 8px; 
-      transition: all 0.2s; 
-      flex-shrink: 0; 
+    /* ================= TABS ================= */
+    .tabs {
+      display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--gray-200); padding-bottom: 8px; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
     }
-    
-    .tab-btn:hover { 
-      background: var(--gray-100); 
-      color: var(--gray-700); 
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      padding: 10px 20px; border: none; background: none; color: var(--gray-500); font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s; flex-shrink: 0;
     }
-    
-    .tab-btn.active { 
-      background: var(--primary); 
-      color: white; 
-    }
-    
+    .tab-btn:hover { background: var(--gray-100); color: var(--gray-700); }
+    .tab-btn.active { background: var(--primary); color: white; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     
     /* ================= DASHBOARD SECTIONS ================= */
-    .today-status {
-      background: linear-gradient(135deg, #1e40af 0%, #3B82F6 100%); 
-      border-radius: 16px; 
-      padding: 24px; 
-      margin-bottom: 24px; 
-      color: white;
-    }
-    
-    .today-status h3 { 
-      font-size: 14px; 
-      opacity: 0.9; 
-      margin-bottom: 16px; 
-    }
-    
-    .today-grid { 
-      display: grid; 
-      grid-template-columns: repeat(3, 1fr); 
-      gap: 16px; 
-    }
-    
+    .today-status { background: linear-gradient(135deg, #1e40af 0%, #3B82F6 100%); border-radius: 16px; padding: 24px; margin-bottom: 24px; color: white; }
+    .today-status h3 { font-size: 14px; opacity: 0.9; margin-bottom: 16px; }
+    .today-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .today-item { text-align: center; }
     .today-item .time { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
     .today-item .label { font-size: 12px; opacity: 0.8; }
-    
-    .today-badge { 
-      display: inline-block; 
-      background: rgba(255,255,255,0.2); 
-      padding: 8px 16px; 
-      border-radius: 20px; 
-      font-size: 13px; 
-      margin-top: 16px; 
-    }
-    
+    .today-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 13px; margin-top: 16px; }
     .today-badge.success { background: rgba(16, 185, 129, 0.3); }
     .today-badge.warning { background: rgba(245, 158, 11, 0.3); }
     
-    .stats-section { 
-      background: white; 
-      border-radius: 16px; 
-      padding: 24px; 
-      margin-bottom: 24px; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-    }
-    
-    .stats-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 20px; 
-    }
-    
+    .stats-section { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .stats-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .stats-header h3 { font-size: 16px; color: var(--gray-900); }
-    
-    .month-selector { 
-      padding: 8px 16px; 
-      border: 1px solid var(--gray-300); 
-      border-radius: 8px; 
-      font-size: 14px; 
-      cursor: pointer; 
-    }
+    .month-selector { padding: 8px 16px; border: 1px solid var(--gray-300); border-radius: 8px; font-size: 14px; cursor: pointer; }
 
-    /* ================= STATS GRID LAYOUT (NEW 2-ROW DESIGN) ================= */
-    .stats-container {
-      margin-bottom: 24px;
-    }
-
-    .stats-row-1 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr); /* Top row: 4 items */
-      gap: 16px;
-      margin-bottom: 16px; /* Gap between row 1 and row 2 */
-    }
-
-    .stats-row-2 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr); /* Bottom row: 2 expanded items */
-      gap: 16px;
-    }
-    
-    .stat-card { 
-      background: var(--gray-50); 
-      padding: 20px 10px; 
-      border-radius: 12px; 
-      text-align: center; 
-    }
-    
+    .stats-container { margin-bottom: 24px; }
+    .stats-row-1 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+    .stats-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .stat-card { background: var(--gray-50); padding: 20px 10px; border-radius: 12px; text-align: center; }
     .stat-card .stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
     .stat-card .stat-value.success { color: var(--success); }
     .stat-card .stat-value.danger { color: var(--danger); }
@@ -376,36 +196,22 @@
     .stat-card .stat-label { color: var(--gray-500); font-size: 12px; }
     
     /* ================= TABLES ================= */
-    .attendance-table { 
-      width: 100%;
-      overflow-x: auto; 
-      -webkit-overflow-scrolling: touch; 
-    }
-    
+    .attendance-table { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; min-width: 500px; }
     th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--gray-200); font-size: 14px; }
     th { background: var(--gray-50); font-weight: 600; color: var(--gray-700); font-size: 12px; text-transform: uppercase; }
-    
     .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
     .badge-success { background: #D1FAE5; color: #059669; }
     .badge-warning { background: #FEF3C7; color: #D97706; }
     .badge-danger { background: #FEE2E2; color: #DC2626; }
     
     /* ================= PROFILE ================= */
-    .profile-section {
-      background: white; 
-      border-radius: 16px; 
-      padding: 24px; 
-      margin-bottom: 24px; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    
+    .profile-section { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
     .profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); }
     .profile-info h2 { font-size: 22px; color: var(--gray-900); margin-bottom: 4px; }
     .profile-info .emp-id { color: var(--gray-500); font-size: 14px; margin-bottom: 8px; }
     .profile-info .dept-badge { display: inline-block; background: #DBEAFE; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; }
-    
     .profile-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
     .profile-detail { background: var(--gray-50); padding: 16px; border-radius: 10px; }
     .profile-detail .label { color: var(--gray-500); font-size: 12px; margin-bottom: 4px; }
@@ -417,59 +223,30 @@
     .settings-form { max-width: 400px; }
     
     /* ================= UTILITY & TOAST ================= */
-    .toast { 
-      position: fixed; 
-      bottom: 24px; 
-      right: 24px; 
-      padding: 16px 24px; 
-      background: var(--gray-900); 
-      color: white; 
-      border-radius: 10px; 
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
-      z-index: 2000; 
-      display: none; 
-    }
-    
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 16px 24px; background: var(--gray-900); color: white; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 2000; display: none; }
     .toast.success { background: var(--success); }
     .toast.error { background: var(--danger); }
     .toast.show { display: block; animation: slideIn 0.3s ease; }
     @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    
     .loading { display: flex; align-items: center; justify-content: center; padding: 40px; }
     .spinner { width: 30px; height: 30px; border: 3px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    
     .empty-state { text-align: center; padding: 40px; color: var(--gray-500); }
     .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
     
-    /* ================= MOBILE RESPONSIVE MEDIA QUERIES ================= */
+    /* ================= MOBILE RESPONSIVE ================= */
     @media (max-width: 768px) {
       .app-header { padding: 12px 16px; }
       .main-content { padding: 16px; }
-      
-      .profile-section, 
-      .today-status, 
-      .stats-section, 
-      .settings-section { 
-        padding: 16px; 
-      }
-      
-      /* Mobile layout for Stats Rows: 2 items per row */
-      .stats-row-1, .stats-row-2 { 
-        grid-template-columns: repeat(2, 1fr); 
-      }
-      
+      .profile-section, .today-status, .stats-section, .settings-section { padding: 16px; }
+      .stats-row-1, .stats-row-2 { grid-template-columns: repeat(2, 1fr); }
       .today-grid { grid-template-columns: 1fr; gap: 12px; } 
-      
       .profile-header { flex-direction: column; text-align: center; }
       .profile-details { grid-template-columns: 1fr; } 
-      
       .stats-header { flex-direction: column; gap: 12px; align-items: flex-start; }
       .month-selector { width: 100%; } 
-      
       .login-box { padding: 60px 20px 30px; margin-top: 40px; }
     }
-
     @media (max-width: 480px) {
       .header-logo h1 { display: none; }
       .user-name { display: none; }
@@ -493,20 +270,29 @@
           <label>Employee ID</label>
           <input type="text" id="loginEmpId" placeholder="MC1234" required>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="passwordGroup">
           <label>Password</label>
-          <input type="password" id="loginPassword" placeholder="Enter your password" required>
+          <input type="password" id="loginPassword" placeholder="Enter your password">
         </div>
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-sign-in-alt"></i> Login
+        
+        <button type="submit" class="btn btn-primary" id="btnPasswordLogin">
+          <i class="fas fa-sign-in-alt"></i> Password Login
         </button>
+        
+        <button type="button" class="btn btn-face" id="btnFaceLogin">
+          <i class="fas fa-camera"></i> Login with Face
+        </button>
+
+        <div id="webcam-container">
+          <video id="video" autoplay muted></video>
+          <div class="face-scan-text" id="faceScanStatus">Starting Camera & Loading AI...</div>
+        </div>
       </form>
     </div>
   </div>
 
   <!-- ================= MAIN APP CONTAINER ================= -->
   <div class="app-container" id="appContainer">
-    
     <!-- HEADER -->
     <header class="app-header">
       <div class="header-content">
@@ -527,23 +313,14 @@
     <main class="main-content">
       <!-- TABS -->
       <div class="tabs">
-        <button class="tab-btn active" data-tab="dashboard">
-          <i class="fas fa-home"></i> Dashboard
-        </button>
-        <button class="tab-btn" data-tab="attendance">
-          <i class="fas fa-calendar"></i> Attendance
-        </button>
-        <button class="tab-btn" data-tab="profile">
-          <i class="fas fa-user"></i> Profile
-        </button>
-        <button class="tab-btn" data-tab="settings">
-          <i class="fas fa-cog"></i> Settings
-        </button>
+        <button class="tab-btn active" data-tab="dashboard"><i class="fas fa-home"></i> Dashboard</button>
+        <button class="tab-btn" data-tab="attendance"><i class="fas fa-calendar"></i> Attendance</button>
+        <button class="tab-btn" data-tab="profile"><i class="fas fa-user"></i> Profile</button>
+        <button class="tab-btn" data-tab="settings"><i class="fas fa-cog"></i> Settings</button>
       </div>
 
       <!-- ================= TAB: DASHBOARD ================= -->
       <div class="tab-content active" id="dashboardTab">
-        <!-- Today's Status -->
         <div class="today-status">
           <h3><i class="fas fa-clock"></i> Today's Status - <span id="todayDate"></span></h3>
           <div class="today-grid">
@@ -563,61 +340,28 @@
           <span class="today-badge" id="todayBadge">Not Punched</span>
         </div>
 
-        <!-- Monthly Summary Overview -->
         <div class="stats-section">
           <div class="stats-header">
             <h3>This Month Summary</h3>
           </div>
-          
           <div class="stats-container">
-            <!-- Row 1: 4 Cards -->
             <div class="stats-row-1">
-              <div class="stat-card">
-                <div class="stat-value success" id="quickPresent">-</div>
-                <div class="stat-label">Present</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value danger" id="quickAbsent">-</div>
-                <div class="stat-label">Absent</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value warning" id="quickLate">-</div>
-                <div class="stat-label">Late</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value primary" id="quickPercent">-</div>
-                <div class="stat-label">Attendance %</div>
-              </div>
+              <div class="stat-card"><div class="stat-value success" id="quickPresent">-</div><div class="stat-label">Present</div></div>
+              <div class="stat-card"><div class="stat-value danger" id="quickAbsent">-</div><div class="stat-label">Absent</div></div>
+              <div class="stat-card"><div class="stat-value warning" id="quickLate">-</div><div class="stat-label">Late</div></div>
+              <div class="stat-card"><div class="stat-value primary" id="quickPercent">-</div><div class="stat-label">Attendance %</div></div>
             </div>
-            
-            <!-- Row 2: 2 Expanded Cards -->
             <div class="stats-row-2">
-              <div class="stat-card">
-                <div class="stat-value info" id="quickWeekOff">-</div>
-                <div class="stat-label">Week Offs</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value purple" id="quickHoliday">-</div>
-                <div class="stat-label">Holidays</div>
-              </div>
+              <div class="stat-card"><div class="stat-value info" id="quickWeekOff">-</div><div class="stat-label">Week Offs</div></div>
+              <div class="stat-card"><div class="stat-value purple" id="quickHoliday">-</div><div class="stat-label">Holidays</div></div>
             </div>
           </div>
 
           <h4 style="margin-bottom: 16px; color: var(--gray-700);">Recent Activity</h4>
           <div class="attendance-table">
             <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Punch In</th>
-                  <th>Punch Out</th>
-                  <th>Hours</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="recentActivityTable">
-                <tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>
-              </tbody>
+              <thead><tr><th>Date</th><th>Punch In</th><th>Punch Out</th><th>Hours</th><th>Status</th></tr></thead>
+              <tbody id="recentActivityTable"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -628,58 +372,24 @@
         <div class="stats-section">
           <div class="stats-header">
             <h3>Attendance History</h3>
-            <select class="month-selector" id="monthSelector" onchange="loadAttendance()">
-            </select>
+            <select class="month-selector" id="monthSelector" onchange="loadAttendance()"></select>
           </div>
-          
           <div class="stats-container" id="monthlyStats">
-            <!-- Row 1: 4 Cards -->
             <div class="stats-row-1">
-              <div class="stat-card">
-                <div class="stat-value success" id="monthPresent">-</div>
-                <div class="stat-label">Present</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value danger" id="monthAbsent">-</div>
-                <div class="stat-label">Absent</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value warning" id="monthLate">-</div>
-                <div class="stat-label">Late</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value primary" id="monthHours">-</div>
-                <div class="stat-label">Total Hours</div>
-              </div>
+              <div class="stat-card"><div class="stat-value success" id="monthPresent">-</div><div class="stat-label">Present</div></div>
+              <div class="stat-card"><div class="stat-value danger" id="monthAbsent">-</div><div class="stat-label">Absent</div></div>
+              <div class="stat-card"><div class="stat-value warning" id="monthLate">-</div><div class="stat-label">Late</div></div>
+              <div class="stat-card"><div class="stat-value primary" id="monthHours">-</div><div class="stat-label">Total Hours</div></div>
             </div>
-            
-            <!-- Row 2: 2 Expanded Cards -->
             <div class="stats-row-2">
-              <div class="stat-card">
-                <div class="stat-value info" id="monthWeekOff">-</div>
-                <div class="stat-label">Week Offs</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value purple" id="monthHoliday">-</div>
-                <div class="stat-label">Holidays</div>
-              </div>
+              <div class="stat-card"><div class="stat-value info" id="monthWeekOff">-</div><div class="stat-label">Week Offs</div></div>
+              <div class="stat-card"><div class="stat-value purple" id="monthHoliday">-</div><div class="stat-label">Holidays</div></div>
             </div>
           </div>
-          
           <div class="attendance-table">
             <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Punch In</th>
-                  <th>Punch Out</th>
-                  <th>Work Hours</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="attendanceTable">
-                <tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>
-              </tbody>
+              <thead><tr><th>Date</th><th>Punch In</th><th>Punch Out</th><th>Work Hours</th><th>Status</th></tr></thead>
+              <tbody id="attendanceTable"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -696,32 +406,13 @@
               <span class="dept-badge" id="profileDept">-</span>
             </div>
           </div>
-          
           <div class="profile-details">
-            <div class="profile-detail">
-              <div class="label">Email</div>
-              <div class="value" id="profileEmail">-</div>
-            </div>
-            <div class="profile-detail">
-              <div class="label">Phone</div>
-              <div class="value" id="profilePhone">-</div>
-            </div>
-            <div class="profile-detail">
-              <div class="label">Designation</div>
-              <div class="value" id="profileDesignation">-</div>
-            </div>
-            <div class="profile-detail">
-              <div class="label">Join Date</div>
-              <div class="value" id="profileJoinDate">-</div>
-            </div>
-            <div class="profile-detail">
-              <div class="label">Week Off</div>
-              <div class="value" id="profileWeekOff">-</div>
-            </div>
-            <div class="profile-detail">
-              <div class="label">Status</div>
-              <div class="value" id="profileStatus">-</div>
-            </div>
+            <div class="profile-detail"><div class="label">Email</div><div class="value" id="profileEmail">-</div></div>
+            <div class="profile-detail"><div class="label">Phone</div><div class="value" id="profilePhone">-</div></div>
+            <div class="profile-detail"><div class="label">Designation</div><div class="value" id="profileDesignation">-</div></div>
+            <div class="profile-detail"><div class="label">Join Date</div><div class="value" id="profileJoinDate">-</div></div>
+            <div class="profile-detail"><div class="label">Week Off</div><div class="value" id="profileWeekOff">-</div></div>
+            <div class="profile-detail"><div class="label">Status</div><div class="value" id="profileStatus">-</div></div>
           </div>
         </div>
       </div>
@@ -743,9 +434,7 @@
               <label>Confirm New Password</label>
               <input type="password" id="confirmPassword" required minlength="6">
             </div>
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-key"></i> Change Password
-            </button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Change Password</button>
           </form>
         </div>
       </div>
@@ -756,12 +445,14 @@
 
   <script>
     // ============================================================
-    // ⚠️ YAHAN APNE EMPLOYEE PORTAL WALE APPS SCRIPT KI URL DAALEIN
+    // ⚠️ YAHAN APNE EMPLOYEE PORTAL WALE APPS SCRIPT KI NAYI URL DAALEIN
     // ============================================================
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxPxRUqdubBd2xkGH1vSMq7tDzN1Zg_ABdY88etLy0f1KMKwCmas7to_XbI7WrpwHsk/exec'; 
+    const API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'; 
     // ============================================================
 
     let currentEmployee = null;
+    let faceModelsLoaded = false;
+    let videoStream = null;
 
     // ============ API HELPER ============
     async function apiCall(params) {
@@ -770,9 +461,7 @@
         if (params.action === 'changePassword') {
           response = await fetch(API_URL, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams(params).toString()
           });
         } else {
@@ -780,8 +469,7 @@
           Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
           response = await fetch(url.toString());
         }
-        const data = await response.json();
-        return data;
+        return await response.json();
       } catch (error) {
         console.error('API Error:', error);
         return { success: false, message: 'Network error: ' + error.message };
@@ -796,9 +484,12 @@
         showApp();
       }
 
-      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+      // Login Listeners
+      document.getElementById('loginForm').addEventListener('submit', handlePasswordLogin);
+      document.getElementById('btnFaceLogin').addEventListener('click', handleFaceLogin);
       document.getElementById('passwordForm').addEventListener('submit', handlePasswordChange);
 
+      // Tab Listeners
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           const tab = this.dataset.tab;
@@ -807,24 +498,164 @@
       });
     });
 
-    // ============ AUTHENTICATION ============
-    async function handleLogin(e) {
+    // ============ AUTHENTICATION (PASSWORD) ============
+    async function handlePasswordLogin(e) {
       e.preventDefault();
       const empId = document.getElementById('loginEmpId').value.trim();
       const password = document.getElementById('loginPassword').value;
 
+      if (!password) {
+        showToast('Please enter password', 'error');
+        return;
+      }
+
       showToast('Logging in...', '');
-      
       const result = await apiCall({ action: 'employeeLogin', empId: empId, password: password });
       
       if (result.success) {
-        currentEmployee = result.employee;
-        sessionStorage.setItem('punchbook_employee', JSON.stringify(currentEmployee));
-        showApp();
-        showToast('Welcome back, ' + currentEmployee.name + '!', 'success');
+        loginSuccess(result.employee);
       } else {
         showToast(result.message, 'error');
       }
+    }
+
+    // ============ FACE RECOGNITION LOGIC ============
+    async function loadFaceModels() {
+      if (faceModelsLoaded) return true;
+      try {
+        const modelPath = 'https://justadudewhohacks.github.io/face-api.js/models';
+        await Promise.all([
+          faceapi.nets.faceRecognitionNet.loadFromUri(modelPath),
+          faceapi.nets.faceLandmark68Net.loadFromUri(modelPath),
+          faceapi.nets.ssdMobilenetv1.loadFromUri(modelPath)
+        ]);
+        faceModelsLoaded = true;
+        return true;
+      } catch (e) {
+        showToast('Failed to load AI Face models. Check connection.', 'error');
+        return false;
+      }
+    }
+
+    async function handleFaceLogin() {
+      const empId = document.getElementById('loginEmpId').value.trim();
+      if (!empId) {
+        showToast('Please enter Employee ID first!', 'error');
+        return;
+      }
+
+      document.getElementById('webcam-container').style.display = 'flex';
+      document.getElementById('faceScanStatus').textContent = 'Loading AI Models...';
+      document.getElementById('passwordGroup').style.display = 'none';
+      document.getElementById('btnPasswordLogin').style.display = 'none';
+      document.getElementById('btnFaceLogin').style.display = 'none';
+
+      // 1. Load Models
+      const isLoaded = await loadFaceModels();
+      if (!isLoaded) { stopCamera(); return; }
+
+      document.getElementById('faceScanStatus').textContent = 'Fetching stored face data...';
+
+      // 2. Get Reference Image from Sheet
+      const refResult = await apiCall({ action: 'getFaceDataRef', empId: empId });
+      if (!refResult.success) {
+        showToast(refResult.message, 'error');
+        stopCamera();
+        return;
+      }
+
+      // 3. Process Reference Image
+      document.getElementById('faceScanStatus').textContent = 'Processing stored image...';
+      const refImage = new Image();
+      refImage.crossOrigin = 'anonymous'; 
+      refImage.src = refResult.photoURL;
+      
+      refImage.onload = async () => {
+        try {
+          const refDetection = await faceapi.detectSingleFace(refImage).withFaceLandmarks().withFaceDescriptor();
+          if (!refDetection) {
+            showToast('No face found in stored record!', 'error');
+            stopCamera();
+            return;
+          }
+          startLiveVerification(empId, refDetection.descriptor);
+        } catch (err) {
+          showToast('Image processing error (Maybe CORS blocked).', 'error');
+          stopCamera();
+        }
+      };
+      
+      refImage.onerror = () => {
+        showToast('Failed to load reference image URL.', 'error');
+        stopCamera();
+      };
+    }
+
+    async function startLiveVerification(empId, refDescriptor) {
+      document.getElementById('faceScanStatus').textContent = 'Starting Camera... Please look straight.';
+      const video = document.getElementById('video');
+      
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = videoStream;
+      } catch (e) {
+        showToast('Camera access denied!', 'error');
+        stopCamera();
+        return;
+      }
+
+      video.onplay = async () => {
+        document.getElementById('faceScanStatus').textContent = 'Scanning your face... Hold still!';
+        
+        let attempts = 0;
+        const scanInterval = setInterval(async () => {
+          attempts++;
+          const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+          
+          if (detection) {
+            const distance = faceapi.euclideanDistance(refDescriptor, detection.descriptor);
+            if (distance < 0.5) { // Threshold 0.5
+              clearInterval(scanInterval);
+              document.getElementById('faceScanStatus').textContent = 'Face Matched! Logging in...';
+              document.getElementById('faceScanStatus').style.color = 'var(--success)';
+              
+              const loginResult = await apiCall({ action: 'employeeFaceLogin', empId: empId });
+              stopCamera();
+              
+              if (loginResult.success) {
+                loginSuccess(loginResult.employee);
+              } else {
+                showToast(loginResult.message, 'error');
+              }
+            }
+          }
+          
+          if (attempts >= 15) { // Timeout after 15 attempts (15 sec)
+            clearInterval(scanInterval);
+            showToast('Face match failed or timed out. Try again.', 'error');
+            stopCamera();
+          }
+        }, 1000); 
+      };
+    }
+
+    function stopCamera() {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
+      }
+      document.getElementById('webcam-container').style.display = 'none';
+      document.getElementById('passwordGroup').style.display = 'block';
+      document.getElementById('btnPasswordLogin').style.display = 'inline-flex';
+      document.getElementById('btnFaceLogin').style.display = 'inline-flex';
+      document.getElementById('faceScanStatus').style.color = 'var(--primary)';
+    }
+
+    function loginSuccess(employeeData) {
+      currentEmployee = employeeData;
+      sessionStorage.setItem('punchbook_employee', JSON.stringify(currentEmployee));
+      showApp();
+      showToast('Welcome back, ' + currentEmployee.name + '!', 'success');
     }
 
     function logout() {
@@ -832,6 +663,7 @@
       currentEmployee = null;
       document.getElementById('loginPage').style.display = 'flex';
       document.getElementById('appContainer').style.display = 'none';
+      document.getElementById('loginPassword').value = '';
     }
 
     function showApp() {
@@ -853,20 +685,12 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById(tab + 'Tab').classList.add('active');
 
-      if (tab === 'attendance') {
-        loadAttendance();
-      }
+      if (tab === 'attendance') loadAttendance();
     }
 
-    // ============ TODAY'S STATUS ============
+    // ============ DASHBOARD DATA ============
     async function loadTodayStatus() {
-      document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN', {
-        weekday: 'long',
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-      });
-
+      document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
       const result = await apiCall({ action: 'getTodayStatus', empId: currentEmployee.empId });
       
       if (result.success) {
@@ -881,17 +705,8 @@
         else if (result.status === 'Late') badge.classList.add('warning');
       }
 
-      // Load this month's quick stats
       const now = new Date();
-      const month = now.getMonth() + 1;
-      const year = now.getFullYear();
-
-      const summaryResult = await apiCall({ 
-        action: 'getAttendanceSummary', 
-        empId: currentEmployee.empId, 
-        month: month, 
-        year: year 
-      });
+      const summaryResult = await apiCall({ action: 'getAttendanceSummary', empId: currentEmployee.empId, month: now.getMonth() + 1, year: now.getFullYear() });
 
       if (summaryResult.success) {
         document.getElementById('quickPresent').textContent = summaryResult.summary.presentDays;
@@ -906,7 +721,6 @@
     // ============ PROFILE ============
     async function loadProfile() {
       const result = await apiCall({ action: 'getEmployeeProfile', empId: currentEmployee.empId });
-      
       if (result.success) {
         const emp = result.employee;
         const photoURL = result.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(emp.name) + '&size=200';
@@ -929,28 +743,18 @@
     async function loadMonthSelector() {
       const result = await apiCall({ action: 'getAvailableMonths' });
       if (result.success) {
-        const select = document.getElementById('monthSelector');
-        select.innerHTML = result.months.map(m => 
-          `<option value="${m.value}">${m.label}</option>`
-        ).join('');
+        document.getElementById('monthSelector').innerHTML = result.months.map(m => `<option value="${m.value}">${m.label}</option>`).join('');
         loadAttendance();
       }
     }
 
     async function loadAttendance() {
-      const monthValue = document.getElementById('monthSelector').value;
-      if (!monthValue) return;
-      
-      const [month, year] = monthValue.split('-');
+      const val = document.getElementById('monthSelector').value;
+      if (!val) return;
+      const [month, year] = val.split('-');
       document.getElementById('attendanceTable').innerHTML = '<tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>';
 
-      const result = await apiCall({ 
-        action: 'getAttendanceSummary', 
-        empId: currentEmployee.empId, 
-        month: parseInt(month), 
-        year: parseInt(year) 
-      });
-
+      const result = await apiCall({ action: 'getAttendanceSummary', empId: currentEmployee.empId, month: parseInt(month), year: parseInt(year) });
       if (result.success) {
         document.getElementById('monthPresent').textContent = result.summary.presentDays;
         document.getElementById('monthAbsent').textContent = result.summary.absentDays;
@@ -958,26 +762,21 @@
         document.getElementById('monthHours').textContent = result.summary.totalHours;
         document.getElementById('monthWeekOff').textContent = result.summary.weekOffs || '0';
         document.getElementById('monthHoliday').textContent = result.summary.holidays || '0';
-        
         renderAttendanceTable(result.records, 'attendanceTable');
       }
     }
 
     async function loadRecentActivity() {
       const result = await apiCall({ action: 'getRecentActivity', empId: currentEmployee.empId, limit: 5 });
-      if (result.success) {
-        renderAttendanceTable(result.records, 'recentActivityTable');
-      }
+      if (result.success) renderAttendanceTable(result.records, 'recentActivityTable');
     }
 
     function renderAttendanceTable(records, tableId) {
       const tbody = document.getElementById(tableId);
-      
       if (records.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-calendar-times"></i><p>No records found</p></td></tr>';
         return;
       }
-      
       tbody.innerHTML = records.map(r => `
         <tr>
           <td>${formatDate(r.date)}</td>
@@ -992,28 +791,14 @@
     // ============ SETTINGS ============
     async function handlePasswordChange(e) {
       e.preventDefault();
-      
       const currentPassword = document.getElementById('currentPassword').value;
       const newPassword = document.getElementById('newPassword').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
       
-      if (newPassword !== confirmPassword) {
-        showToast('New passwords do not match', 'error');
-        return;
-      }
+      if (newPassword !== confirmPassword) return showToast('New passwords do not match', 'error');
+      if (newPassword.length < 6) return showToast('Password must be at least 6 characters', 'error');
       
-      if (newPassword.length < 6) {
-        showToast('Password must be at least 6 characters', 'error');
-        return;
-      }
-      
-      const result = await apiCall({ 
-        action: 'changePassword', 
-        empId: currentEmployee.empId, 
-        currentPassword: currentPassword, 
-        newPassword: newPassword 
-      });
-
+      const result = await apiCall({ action: 'changePassword', empId: currentEmployee.empId, currentPassword: currentPassword, newPassword: newPassword });
       if (result.success) {
         showToast(result.message, 'success');
         document.getElementById('passwordForm').reset();
@@ -1027,19 +812,12 @@
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.className = 'toast show ' + type;
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     function formatDate(dateStr) {
       if (!dateStr) return '-';
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      });
+      return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
     }
   </script>
 </body>
