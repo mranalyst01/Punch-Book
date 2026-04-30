@@ -87,6 +87,7 @@
       outline: none; border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
     }
+    .form-group input[readonly] { background: var(--gray-100); cursor: not-allowed; }
     
     .btn {
       padding: 12px 24px; border: none; border-radius: 8px;
@@ -432,8 +433,13 @@
         <button class="modal-close" onclick="closeEmployeeModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <input type="hidden" id="empId">
+        <!-- editMode is used to check if we are updating an existing user or creating a new one -->
+        <input type="hidden" id="editMode" value="false">
         <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Employee ID *</label>
+            <input type="text" id="empIdInput" placeholder="e.g. EMP001" required>
+          </div>
           <div class="form-group"><label>Full Name *</label><input type="text" id="empName" required></div>
           <div class="form-group"><label>Email *</label><input type="email" id="empEmail" required></div>
           <div class="form-group"><label>Phone</label><input type="tel" id="empPhone"></div>
@@ -711,7 +717,12 @@
 
     function openAddEmployeeModal() {
       document.getElementById('employeeModalTitle').textContent = 'Add Employee';
-      document.getElementById('empId').value = '';
+      document.getElementById('editMode').value = 'false'; // Adding a new employee
+      
+      const idInput = document.getElementById('empIdInput');
+      idInput.value = '';
+      idInput.readOnly = false; // Allow manual entry
+      
       document.getElementById('empName').value = '';
       document.getElementById('empEmail').value = '';
       document.getElementById('empPhone').value = '';
@@ -720,6 +731,7 @@
       document.getElementById('empJoinDate').value = '';
       document.getElementById('empPassword').value = '';
       document.getElementById('empStatus').value = 'Active';
+      
       document.getElementById('employeeModal').classList.add('active');
     }
 
@@ -728,7 +740,12 @@
       if (result.success) {
         const emp = result.employee;
         document.getElementById('employeeModalTitle').textContent = 'Edit Employee';
-        document.getElementById('empId').value = emp.empId;
+        document.getElementById('editMode').value = 'true'; // Updating an existing employee
+        
+        const idInput = document.getElementById('empIdInput');
+        idInput.value = emp.empId;
+        idInput.readOnly = true; // Prevent changing ID when editing
+        
         document.getElementById('empName').value = emp.name;
         document.getElementById('empEmail').value = emp.email;
         document.getElementById('empPhone').value = emp.phone || '';
@@ -736,6 +753,7 @@
         document.getElementById('empDesignation').value = emp.designation;
         document.getElementById('empJoinDate').value = formatDate(new Date(emp.joinDate));
         document.getElementById('empStatus').value = emp.status;
+        
         document.getElementById('employeeModal').classList.add('active');
       }
     }
@@ -745,8 +763,16 @@
     }
 
     async function saveEmployee() {
-      const empId = document.getElementById('empId').value;
+      const editMode = document.getElementById('editMode').value === 'true';
+      const empId = document.getElementById('empIdInput').value;
+
+      if (!empId) {
+        showToast("Employee ID is required", "error");
+        return;
+      }
+
       const empData = {
+        empId: empId, // Set manual Emp ID
         name: document.getElementById('empName').value,
         email: document.getElementById('empEmail').value,
         phone: document.getElementById('empPhone').value,
@@ -758,7 +784,7 @@
       };
 
       let result;
-      if (empId) {
+      if (editMode) {
         result = await apiCall({ action: 'updateEmployee', empId, empData: JSON.stringify(empData) });
       } else {
         result = await apiCall({ action: 'addEmployee', empData: JSON.stringify(empData) });
