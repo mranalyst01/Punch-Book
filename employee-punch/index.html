@@ -176,103 +176,80 @@
   </div>
 
   <script>
-    // ---------- SIMULATED BACKEND USING LOCALSTORAGE ----------
-    // Hardcoded demo employee. Replace/remove this demo when using a real backend.
-    const DEMO_EMPLOYEE = {
-      empId: "EMP001",
-      empName: "Demo User",
-      photoURL: "",  // leave empty to show a generated avatar
-      department: "Engineering",
-      designation: "Developer"
-    };
+    // ================== CONFIGURATION ==================
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxd3AesxUPpR2ubxWciUPObrjOU7ZKeUvw9FATARaD2Ff8FevUhwy3HfR9cAoKRElIl/exec';
+    // ===================================================
 
-    // All employee data (currently only one). You can expand this array.
-    const EMPLOYEES = [DEMO_EMPLOYEE];
-
-    // Helper: get today's date as YYYY-MM-DD
-    function getTodayKey() {
-      const now = new Date();
-      return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-    }
-
-    // Helper: get storage key for a particular employee's daily punch
-    function getPunchKey(empId) {
-      return 'punch_' + empId + '_' + getTodayKey();
-    }
-
-    // Simulate google.script.run.getAllFaceData() -> returns empty (no actual descriptors to match)
-    // In simulation mode, any detected face is mapped to DEMO_EMPLOYEE.
-    function getAllFaceData() {
-      return { success: true, faceData: [] }; // no stored descriptors needed
-    }
-
-    // Simulate google.script.run.getEmployeeById(empId)
-    function server_getEmployeeById(empId) {
-      const emp = EMPLOYEES.find(e => e.empId === empId);
-      return { success: !!emp, employee: emp };
-    }
-
-    // Simulate google.script.run.getTodayPunchStatus(empId)
-    function server_getTodayPunchStatus(empId) {
-      const record = JSON.parse(localStorage.getItem(getPunchKey(empId)) || '{}');
-      return {
-        success: true,
-        hasPunchedIn: !!record.punchIn,
-        punchIn: record.punchIn || null,
-        hasPunchedOut: !!record.punchOut,
-        punchOut: record.punchOut || null
-      };
-    }
-
-    // Simulate google.script.run.punchIn(empId, empName, capturedPhoto)
-    function server_punchIn(empId, empName, capturedPhoto) {
-      const key = getPunchKey(empId);
-      const record = JSON.parse(localStorage.getItem(key) || '{}');
-      if (record.punchIn) {
-        return { success: false, message: 'Already punched in today.' };
-      }
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('en-IN', { hour12: false });
-      record.punchIn = timeStr;
-      record.empName = empName;
-      record.capturedPhotoIn = capturedPhoto || '';
-      localStorage.setItem(key, JSON.stringify(record));
-      return { success: true, time: timeStr, workHours: null };
-    }
-
-    // Simulate google.script.run.punchOut(empId, capturedPhoto)
-    function server_punchOut(empId, capturedPhoto) {
-      const key = getPunchKey(empId);
-      const record = JSON.parse(localStorage.getItem(key) || '{}');
-      if (!record.punchIn) {
-        return { success: false, message: 'You have not punched in yet.' };
-      }
-      if (record.punchOut) {
-        return { success: false, message: 'Already punched out today.' };
-      }
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('en-IN', { hour12: false });
-      record.punchOut = timeStr;
-      record.capturedPhotoOut = capturedPhoto || '';
-      // calculate work hours
-      const [inH, inM] = record.punchIn.split(':').map(Number);
-      const outH = now.getHours(), outM = now.getMinutes();
-      const diffMin = (outH*60 + outM) - (inH*60 + inM);
-      const hours = (diffMin / 60).toFixed(1);
-      record.workHours = hours;
-      localStorage.setItem(key, JSON.stringify(record));
-      return { success: true, time: timeStr, workHours: hours };
-    }
-    // ---------- END OF SIMULATED BACKEND ----------
-
-    // Original app logic (adapted)
+    // Global variables
     let videoStream = null;
-    let faceDataList = [];
-    let recognizedEmployee = null;
+    let faceDataList = [];            // loaded from server (includes face descriptors)
+    let recognizedEmployee = null;   // { empId, empName, photoURL, capturedPhoto }
     let currentPunchStatus = null;
     let isProcessing = false;
     let detectionInterval = null;
 
+    // ---------- Apps Script API helpers ----------
+    async function callAppsScript(actionData) {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(actionData)
+        });
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('API call failed:', error);
+        return { success: false, message: 'Network error or server unreachable.' };
+      }
+    }
+
+    // Fetch all face data (face descriptors) from server
+    async function fetchAllFaceData() {
+      const result = await callAppsScript({ action: 'getAllFaceData' });
+      if (result.success) {
+        // Ensure face descriptors are converted to Float32Array if they come as arrays
+        faceDataList = result.faceData.map(emp => ({
+          ...emp,
+          faceDescriptor: Array.isArray(emp.faceDescriptor) ? new Float32Array(emp.faceDescriptor) : emp.faceDescriptor
+        }));
+      }
+      return result;
+    }
+
+    // Fetch employee details by id
+    async function fetchEmployeeById(empId) {
+      return await callAppsScript({ action: 'getEmployeeById', empId: empId });
+    }
+
+    // Fetch today's punch status
+    async function fetchTodayPunchStatus(empId) {
+      return await callAppsScript({ action: 'getTodayPunchStatus', empId: empId });
+    }
+
+    // Punch In request
+    async function requestPunchIn(empId, empName, capturedPhoto) {
+      return await callAppsScript({
+        action: 'punchIn',
+        empId: empId,
+        empName: empName,
+        capturedPhoto: capturedPhoto
+      });
+    }
+
+    // Punch Out request
+    async function requestPunchOut(empId, capturedPhoto) {
+      return await callAppsScript({
+        action: 'punchOut',
+        empId: empId,
+        capturedPhoto: capturedPhoto
+      });
+    }
+    // ---------- End of API helpers ----------
+
+    // Original app logic (adapted)
     document.addEventListener('DOMContentLoaded', async function() {
       startClock();
       await initializeFaceRecognition();
@@ -302,11 +279,9 @@
           faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
           faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
         ]);
-        updateStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Loading employee data...');
-        // Use simulated backend call
-        const result = getAllFaceData(); // { success: true, faceData: [] }
+        updateStatus('loading', '<i class="fas fa-spinner fa-spin"></i> Loading employee data from server...');
+        const result = await fetchAllFaceData();
         if (result.success) {
-          faceDataList = result.faceData;
           startCamera();
         } else {
           updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> ' + result.message);
@@ -338,8 +313,10 @@
     }
 
     function startFaceDetection() {
-      // We no longer require faceDataList to be non-empty because we simulate recognition.
-      // But if you want real matching, you would need to register real descriptors.
+      if (faceDataList.length === 0) {
+        updateStatus('error', '<i class="fas fa-exclamation-triangle"></i> No registered employees found.');
+        return;
+      }
       const video = document.getElementById('video');
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
@@ -355,14 +332,12 @@
             ctx.lineWidth = 3;
             ctx.strokeRect(box.x, box.y, box.width, box.height);
 
-            // ------- SIMULATION: any face recognised as DEMO_EMPLOYEE -------
-            // If you have real descriptors, use findMatchingEmployee(detection.descriptor)
-            // For demo, we skip matching and just pick the first employee.
-            const matchedEmployee = DEMO_EMPLOYEE; // always recognised as demo user
+            // ---- REAL FACE MATCHING ----
+            const matchedEmployee = findMatchingEmployee(detection.descriptor);
             if (matchedEmployee) {
               isProcessing = true;
               clearInterval(detectionInterval);
-              recognizedEmployee = matchedEmployee;
+              recognizedEmployee = { ...matchedEmployee }; // store matched employee data
               updateStatus('success', '<i class="fas fa-check-circle"></i> Recognized: ' + matchedEmployee.empName);
               // Capture photo from video
               const tempCanvas = document.createElement('canvas');
@@ -373,15 +348,16 @@
               setTimeout(() => { showEmployeeCard(matchedEmployee); }, 1000);
             }
           }
-        } catch (e) {}
+        } catch (e) {
+          console.error('Detection error:', e);
+        }
       }, 300);
     }
 
-    // This function is kept but not used in simulation mode.
-    // Uncomment and use if you switch to real face descriptors.
+    // Face matching against loaded descriptors
     function findMatchingEmployee(detectedDescriptor) {
       let bestMatch = null;
-      let bestDistance = 0.6;
+      let bestDistance = 0.6; // threshold
       for (const faceData of faceDataList) {
         const distance = faceapi.euclideanDistance(detectedDescriptor, faceData.faceDescriptor);
         if (distance < bestDistance) {
@@ -392,22 +368,23 @@
       return bestMatch;
     }
 
-    function showEmployeeCard(employee) {
+    async function showEmployeeCard(employee) {
       document.getElementById('cameraSection').classList.add('hidden');
       document.getElementById('employeeAvatar').src = employee.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(employee.empName);
       document.getElementById('employeeName').textContent = employee.empName;
       document.getElementById('employeeIdDisplay').textContent = employee.empId;
 
-      // Fetch employee details from simulated backend
-      const result = server_getEmployeeById(employee.empId);
-      if (result.success) {
-        document.getElementById('employeeDept').textContent = result.employee.department + ' - ' + result.employee.designation;
+      // Fetch employee details from server
+      const empResult = await fetchEmployeeById(employee.empId);
+      if (empResult.success && empResult.employee) {
+        document.getElementById('employeeDept').textContent = 
+          empResult.employee.department + ' - ' + empResult.employee.designation;
       } else {
         document.getElementById('employeeDept').textContent = 'Unknown';
       }
 
       // Fetch today's punch status
-      const status = server_getTodayPunchStatus(employee.empId);
+      const status = await fetchTodayPunchStatus(employee.empId);
       currentPunchStatus = status;
       if (status.success) {
         if (status.hasPunchedIn) {
@@ -431,11 +408,11 @@
       document.getElementById('employeeCard').classList.add('show');
     }
 
-    function doPunchIn() {
+    async function doPunchIn() {
       const btn = document.getElementById('btnPunchIn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Processing...';
-      const result = server_punchIn(recognizedEmployee.empId, recognizedEmployee.empName, recognizedEmployee.capturedPhoto);
+      const result = await requestPunchIn(recognizedEmployee.empId, recognizedEmployee.empName, recognizedEmployee.capturedPhoto);
       if (result.success) {
         showSuccess('Punch In Successful!', result.time, 'Have a great day!');
       } else {
@@ -445,11 +422,11 @@
       }
     }
 
-    function doPunchOut() {
+    async function doPunchOut() {
       const btn = document.getElementById('btnPunchOut');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Processing...';
-      const result = server_punchOut(recognizedEmployee.empId, recognizedEmployee.capturedPhoto);
+      const result = await requestPunchOut(recognizedEmployee.empId, recognizedEmployee.capturedPhoto);
       if (result.success) {
         showSuccess('Punch Out Successful!', result.time, 'Total hours: ' + result.workHours + ' hrs');
       } else {
