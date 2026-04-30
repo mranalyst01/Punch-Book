@@ -272,7 +272,7 @@
     @media (max-width: 480px) {
       .stats-grid { grid-template-columns: 1fr; }
       .filters { flex-direction: column; }
-      .admin-info span { display: none; } /* Hide admin name on very small screens, show only avatar */
+      .admin-info span { display: none; }
     }
   </style>
 </head>
@@ -281,7 +281,6 @@
   <div class="login-container" id="loginPage">
     <div class="login-box">
       <div class="logo-container">
-        <!-- Make sure to place 'punchbook_logo.png' in the same folder as this HTML file -->
         <img src="punchbook_logo.png" alt="Punch Book" class="logo">
       </div>
       <div class="login-logo">
@@ -308,7 +307,6 @@
   </div>
 
   <div class="app-container" id="appContainer">
-    <!-- Overlay for mobile sidebar -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <nav class="sidebar" id="sidebar">
@@ -374,8 +372,8 @@
           <div class="card-body">
             <div class="table-responsive">
               <table>
-                <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Department</th><th>Designation</th><th>Status</th><th>Face</th><th>Actions</th></tr></thead>
-                <tbody id="employeesTable"><tr><td colspan="8" class="loading"><div class="spinner"></div></td></tr></tbody>
+                <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Department</th><th>Designation</th><th>Week Off</th><th>Status</th><th>Face</th><th>Actions</th></tr></thead>
+                <tbody id="employeesTable"><tr><td colspan="9" class="loading"><div class="spinner"></div></td></tr></tbody>
               </table>
             </div>
           </div>
@@ -433,7 +431,6 @@
         <button class="modal-close" onclick="closeEmployeeModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <!-- editMode is used to check if we are updating an existing user or creating a new one -->
         <input type="hidden" id="editMode" value="false">
         <div class="form-grid">
           <div class="form-group full-width">
@@ -458,6 +455,18 @@
           <div class="form-group"><label>Designation *</label><input type="text" id="empDesignation" required></div>
           <div class="form-group"><label>Join Date *</label><input type="date" id="empJoinDate" required></div>
           <div class="form-group"><label>Password *</label><input type="password" id="empPassword" placeholder="For employee login"></div>
+          <div class="form-group">
+            <label>Week Off *</label>
+            <select id="empWeekOff" required>
+              <option value="Sunday">Sunday</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+            </select>
+          </div>
           <div class="form-group"><label>Status</label><select id="empStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
         </div>
       </div>
@@ -499,7 +508,7 @@
 
   <script>
     // ============================================================
-    // ⚠️  SIRF YEH LINE BADLO - APNI APPS SCRIPT URL YAHAN DAALO
+    // ⚠️ SIRF YEH LINE BADLO - APNI APPS SCRIPT URL YAHAN DAALO
     // ============================================================
     const API_URL = 'https://script.google.com/macros/s/AKfycbyuAX9wMJcfRoFozWF1FTR_Gt5c8wIVw1EUYraVzB3iNUEb29dxOP8SAs9MXo7CI8op/exec';
     // ============================================================
@@ -517,7 +526,6 @@
       try {
         let response;
         
-        // Bada data (jaise photo Base64) bhejne ke liye POST method use karenge
         if (params.action === 'saveFaceData') {
           response = await fetch(API_URL, {
             method: 'POST',
@@ -527,7 +535,6 @@
             body: new URLSearchParams(params).toString()
           });
         } else {
-          // Baki sab chhote data ke liye normal GET
           const url = new URL(API_URL);
           Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
           response = await fetch(url.toString());
@@ -551,7 +558,6 @@
 
       document.getElementById('loginForm').addEventListener('submit', handleLogin);
       
-      // Mobile Menu Toggle Logic
       const menuBtn = document.getElementById('mobileMenuBtn');
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('sidebarOverlay');
@@ -566,7 +572,6 @@
 
       document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function() {
-          // Close sidebar on mobile when a link is clicked
           if (window.innerWidth <= 768) {
             sidebar.classList.remove('show');
             overlay.classList.remove('show');
@@ -575,7 +580,6 @@
         });
       });
 
-      // Default admin banana
       await apiCall({ action: 'createDefaultAdmin' });
 
       const today = new Date();
@@ -676,7 +680,7 @@
     function renderEmployees(employees) {
       const tbody = document.getElementById('employeesTable');
       if (!employees.length) {
-        tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-users"></i><p>No employees found!</p></div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fas fa-users"></i><p>No employees found!</p></div></td></tr>';
         return;
       }
       tbody.innerHTML = employees.map(emp => `
@@ -686,6 +690,7 @@
           <td>${emp.email}</td>
           <td>${emp.department}</td>
           <td>${emp.designation}</td>
+          <td>${emp.weekOff || 'Sunday'}</td>
           <td><span class="badge badge-${emp.status === 'Active' ? 'success' : 'danger'}">${emp.status}</span></td>
           <td><span class="badge badge-info" id="face-${emp.empId}">Checking...</span></td>
           <td>
@@ -717,11 +722,11 @@
 
     function openAddEmployeeModal() {
       document.getElementById('employeeModalTitle').textContent = 'Add Employee';
-      document.getElementById('editMode').value = 'false'; // Adding a new employee
+      document.getElementById('editMode').value = 'false'; 
       
       const idInput = document.getElementById('empIdInput');
       idInput.value = '';
-      idInput.readOnly = false; // Allow manual entry
+      idInput.readOnly = false; 
       
       document.getElementById('empName').value = '';
       document.getElementById('empEmail').value = '';
@@ -730,6 +735,7 @@
       document.getElementById('empDesignation').value = '';
       document.getElementById('empJoinDate').value = '';
       document.getElementById('empPassword').value = '';
+      document.getElementById('empWeekOff').value = 'Sunday';
       document.getElementById('empStatus').value = 'Active';
       
       document.getElementById('employeeModal').classList.add('active');
@@ -740,11 +746,11 @@
       if (result.success) {
         const emp = result.employee;
         document.getElementById('employeeModalTitle').textContent = 'Edit Employee';
-        document.getElementById('editMode').value = 'true'; // Updating an existing employee
+        document.getElementById('editMode').value = 'true'; 
         
         const idInput = document.getElementById('empIdInput');
         idInput.value = emp.empId;
-        idInput.readOnly = true; // Prevent changing ID when editing
+        idInput.readOnly = true; 
         
         document.getElementById('empName').value = emp.name;
         document.getElementById('empEmail').value = emp.email;
@@ -752,6 +758,7 @@
         document.getElementById('empDepartment').value = emp.department;
         document.getElementById('empDesignation').value = emp.designation;
         document.getElementById('empJoinDate').value = formatDate(new Date(emp.joinDate));
+        document.getElementById('empWeekOff').value = emp.weekOff || 'Sunday';
         document.getElementById('empStatus').value = emp.status;
         
         document.getElementById('employeeModal').classList.add('active');
@@ -772,7 +779,7 @@
       }
 
       const empData = {
-        empId: empId, // Set manual Emp ID
+        empId: empId,
         name: document.getElementById('empName').value,
         email: document.getElementById('empEmail').value,
         phone: document.getElementById('empPhone').value,
@@ -780,6 +787,7 @@
         designation: document.getElementById('empDesignation').value,
         joinDate: document.getElementById('empJoinDate').value,
         password: document.getElementById('empPassword').value,
+        weekOff: document.getElementById('empWeekOff').value,
         status: document.getElementById('empStatus').value
       };
 
