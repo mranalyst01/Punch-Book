@@ -37,7 +37,7 @@
     
     .login-box {
       background: white;
-      padding: 80px 40px 40px;
+      padding: 70px 40px 40px;
       margin-top: 60px;
       border-radius: 16px;
       box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
@@ -46,21 +46,34 @@
       position: relative;
     }
     
-    .logo-container { position: absolute; top: -80px; left: 50%; transform: translateX(-50%); }
-    
-    .logo {
-      width: 240px;
-      height: auto;
-      display: block;
-      transform: perspective(900px) rotateX(12deg) rotateY(-10deg) scale(1.05);
-      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.35));
-      transition: all 0.4s ease;
+    .logo-container { 
+      position: absolute; 
+      top: -60px; 
+      left: 50%; 
+      transform: translateX(-50%); 
     }
     
-    .logo:hover { transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.1); }
+    .logo {
+      width: 120px; 
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+      transition: all 0.3s ease;
+    }
+    
+    .logo:hover { 
+      transform: scale(1.05); 
+    }
     
     .login-logo { text-align: center; margin-bottom: 30px; }
-    .login-logo h1 { color: var(--gray-900); font-size: 24px; margin-top: 10px; }
+    
+    .login-logo h1 { 
+      color: #0f172a; 
+      font-size: 28px; 
+      font-weight: 700;
+      margin-top: 10px; 
+    }
+    
     .login-logo p { color: var(--gray-500); font-size: 14px; }
     
     .form-group { margin-bottom: 20px; }
@@ -267,6 +280,7 @@
   <div class="login-container" id="loginPage">
     <div class="login-box">
       <div class="logo-container">
+        <!-- Make sure to place 'punchbook_logo.png' in the same folder as this HTML file -->
         <img src="punchbook_logo.png" alt="Punch Book" class="logo">
       </div>
       <div class="login-logo">
@@ -298,7 +312,7 @@
 
     <nav class="sidebar" id="sidebar">
       <div class="sidebar-logo">
-        <img src="punchbook_logo.png" alt="Punch Book" style="width:40px;height:40px;">
+        <img src="punchbook_logo.png" alt="Punch Book" style="width:40px;height:40px;object-fit:contain;">
         <h2>Punch Book</h2>
       </div>
       <ul class="nav-menu">
