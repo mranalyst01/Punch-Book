@@ -284,7 +284,7 @@
         </button>
 
         <div id="webcam-container">
-          <video id="video" autoplay muted></video>
+          <video id="video" autoplay muted playsinline></video>
           <div class="face-scan-text" id="faceScanStatus">Starting Camera & Loading AI...</div>
         </div>
       </form>
@@ -519,20 +519,23 @@
       }
     }
 
-    // ============ FACE RECOGNITION LOGIC ============
+    // ============ FACE RECOGNITION LOGIC (FAST TINY MODEL) ============
     async function loadFaceModels() {
       if (faceModelsLoaded) return true;
       try {
         const modelPath = 'https://justadudewhohacks.github.io/face-api.js/models';
+        
+        // Fast models load kar rahe hain (TinyFaceDetector)
         await Promise.all([
           faceapi.nets.faceRecognitionNet.loadFromUri(modelPath),
           faceapi.nets.faceLandmark68Net.loadFromUri(modelPath),
-          faceapi.nets.ssdMobilenetv1.loadFromUri(modelPath)
+          faceapi.nets.tinyFaceDetector.loadFromUri(modelPath) 
         ]);
         faceModelsLoaded = true;
         return true;
       } catch (e) {
-        showToast('Failed to load AI Face models. Check connection.', 'error');
+        console.error("Model Load Error:", e);
+        showToast('AI Models load nahi ho paye. Network issue ho sakta hai.', 'error');
         return false;
       }
     }
@@ -540,12 +543,12 @@
     async function handleFaceLogin() {
       const empId = document.getElementById('loginEmpId').value.trim();
       if (!empId) {
-        showToast('Please enter Employee ID first!', 'error');
+        showToast('Pehle Employee ID daalein!', 'error');
         return;
       }
 
       document.getElementById('webcam-container').style.display = 'flex';
-      document.getElementById('faceScanStatus').textContent = 'Loading AI Models...';
+      document.getElementById('faceScanStatus').textContent = 'Loading AI Models (Fast Mode)...';
       document.getElementById('passwordGroup').style.display = 'none';
       document.getElementById('btnPasswordLogin').style.display = 'none';
       document.getElementById('btnFaceLogin').style.display = 'none';
@@ -572,21 +575,24 @@
       
       refImage.onload = async () => {
         try {
-          const refDetection = await faceapi.detectSingleFace(refImage).withFaceLandmarks().withFaceDescriptor();
+          // Yahan TinyFaceDetector ka use kar rahe hain speed ke liye
+          const refDetection = await faceapi.detectSingleFace(refImage, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+          
           if (!refDetection) {
-            showToast('No face found in stored record!', 'error');
+            showToast('Sheet wali photo mein face detect nahi hua!', 'error');
             stopCamera();
             return;
           }
           startLiveVerification(empId, refDetection.descriptor);
         } catch (err) {
-          showToast('Image processing error (Maybe CORS blocked).', 'error');
+          console.error("Image Processing Error:", err);
+          showToast('Image processing error (URL block ho sakti hai).', 'error');
           stopCamera();
         }
       };
       
       refImage.onerror = () => {
-        showToast('Failed to load reference image URL.', 'error');
+        showToast('Sheet se photo load nahi ho payi.', 'error');
         stopCamera();
       };
     }
@@ -599,7 +605,7 @@
         videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = videoStream;
       } catch (e) {
-        showToast('Camera access denied!', 'error');
+        showToast('Camera ki permission denied!', 'error');
         stopCamera();
         return;
       }
@@ -610,11 +616,13 @@
         let attempts = 0;
         const scanInterval = setInterval(async () => {
           attempts++;
-          const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+          
+          // Live video par TinyFaceDetector lagaya hai
+          const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
           
           if (detection) {
             const distance = faceapi.euclideanDistance(refDescriptor, detection.descriptor);
-            if (distance < 0.5) { // Threshold 0.5
+            if (distance < 0.5) { // Match success
               clearInterval(scanInterval);
               document.getElementById('faceScanStatus').textContent = 'Face Matched! Logging in...';
               document.getElementById('faceScanStatus').style.color = 'var(--success)';
@@ -630,9 +638,9 @@
             }
           }
           
-          if (attempts >= 15) { // Timeout after 15 attempts (15 sec)
+          if (attempts >= 15) { // Timeout after 15 seconds
             clearInterval(scanInterval);
-            showToast('Face match failed or timed out. Try again.', 'error');
+            showToast('Face match fail ho gaya. Password se login karein.', 'error');
             stopCamera();
           }
         }, 1000); 
