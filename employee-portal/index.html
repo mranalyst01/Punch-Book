@@ -117,6 +117,37 @@
     #faceLoginSection { display: none; }
     #passwordLoginSection { display: block; }
 
+    /* Employee reveal card - shown after face match */
+    .emp-reveal-card {
+      display: none;
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 2px solid #86efac;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      animation: revealPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .emp-reveal-card.show { display: flex; align-items: center; gap: 14px; }
+    @keyframes revealPop {
+      from { opacity: 0; transform: scale(0.85) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .emp-reveal-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      object-fit: cover; border: 2px solid #22c55e;
+      flex-shrink: 0;
+    }
+    .emp-reveal-info { flex: 1; }
+    .emp-reveal-name {
+      font-size: 16px; font-weight: 700; color: #15803d; line-height: 1.2;
+    }
+    .emp-reveal-id {
+      font-size: 13px; color: #16a34a; margin-top: 2px; font-weight: 500;
+    }
+    .emp-reveal-check {
+      font-size: 22px; color: #22c55e; flex-shrink: 0;
+    }
+
     .face-scan-area {
       position: relative;
       width: 100%;
@@ -425,45 +456,53 @@
 
       <!-- ====== FACE LOGIN ====== -->
       <div id="faceLoginSection">
-        <!-- Step 1: Enter Employee ID -->
+
+        <!-- Step 1: Just a button to start -->
         <div id="faceStep1">
-          <div class="form-group">
-            <label>Employee ID</label>
-            <input type="text" id="faceEmpId" placeholder="MC1234" autocomplete="off"
-              style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+          <div style="text-align:center; padding: 8px 0 16px;">
+            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#dbeafe,#eff6ff);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+              <i class="fas fa-face-smile" style="font-size:28px;color:var(--primary);"></i>
+            </div>
+            <p style="font-size:13px;color:var(--gray-500);margin-bottom:0;">Camera se apna face scan karein — ID ki zaroorat nahi</p>
           </div>
           <button class="btn btn-primary" onclick="startFaceAuth()" id="startFaceBtn">
-            <i class="fas fa-camera"></i> Open Camera & Verify
+            <i class="fas fa-camera"></i> Start Face Scan
           </button>
-          <!-- Model loading progress (hidden initially) -->
+          <!-- Model loading progress -->
           <div class="model-loading-bar" id="modelLoadingBar" style="display:none; margin-top:12px;">
             <span id="modelLoadingText">Loading AI Models...</span>
             <div class="bar-track"><div class="bar-fill" id="modelBarFill"></div></div>
           </div>
         </div>
 
-        <!-- Step 2: Face Scan -->
+        <!-- Step 2: Camera + Scan -->
         <div id="faceStep2" style="display:none;">
           <div class="face-scan-area" id="faceScanArea">
-            <!-- Camera placeholder shown before camera starts -->
             <div class="camera-placeholder" id="cameraPlaceholder">
               <i class="fas fa-camera-slash"></i>
               <span>Camera loading...</span>
             </div>
             <video id="faceVideo" autoplay muted playsinline style="display:none;"></video>
             <canvas id="faceOverlay" class="overlay" style="display:none;"></canvas>
-            <!-- Decorative corner guides -->
             <div class="face-guide-corner fgc-tl"></div>
             <div class="face-guide-corner fgc-tr"></div>
             <div class="face-guide-corner fgc-bl"></div>
             <div class="face-guide-corner fgc-br"></div>
-            <!-- Animated ring -->
             <div class="scan-ring" id="scanRing"></div>
-            <!-- Scan line -->
             <div class="scan-line" id="scanLine"></div>
           </div>
 
-          <div class="face-status-msg" id="faceStatusMsg">Camera ko face ke saamne rakhein...</div>
+          <!-- Employee Reveal Card (shown after match) -->
+          <div class="emp-reveal-card" id="empRevealCard">
+            <img class="emp-reveal-avatar" id="empRevealAvatar" src="">
+            <div class="emp-reveal-info">
+              <div class="emp-reveal-name" id="empRevealName">-</div>
+              <div class="emp-reveal-id" id="empRevealId">-</div>
+            </div>
+            <div class="emp-reveal-check"><i class="fas fa-circle-check"></i></div>
+          </div>
+
+          <div class="face-status-msg" id="faceStatusMsg">Camera ko seedha face ke saamne rakhein...</div>
 
           <div style="display:flex; gap:10px; margin-bottom:12px;">
             <button class="btn btn-primary" onclick="captureFace()" id="captureBtn" style="flex:1;" disabled>
@@ -473,9 +512,6 @@
               <i class="fas fa-times"></i>
             </button>
           </div>
-          <p style="text-align:center; font-size:12px; color:var(--gray-500);">
-            Employee: <strong id="faceEmpIdDisplay">-</strong>
-          </p>
         </div>
       </div>
 
@@ -645,7 +681,6 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbxPxRUqdubBd2xkGH1vSMq7tDzN1Zg_ABdY88etLy0f1KMKwCmas7to_XbI7WrpwHsk/exec'; 
     // ============================================================
 
-    // Face-API models CDN path (vladmandic's hosted models)
     const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model';
 
     let currentEmployee = null;
@@ -654,6 +689,11 @@
     let faceDetectionInterval = null;
     let faceDetected = false;
     let captureInProgress = false;
+
+    // All employee face descriptors loaded from backend
+    // Format: [ { empId, name, photoURL, descriptor: Float32Array } ]
+    let allFaceDescriptors = [];
+    let faceDataLoaded = false;
 
     // ============ API HELPER ============
     async function apiCall(params) {
@@ -683,9 +723,7 @@
         currentEmployee = JSON.parse(saved);
         showApp();
       }
-      // Default to face login mode
       switchLoginMode('face');
-
       document.getElementById('loginForm').addEventListener('submit', handleLogin);
       document.getElementById('passwordForm').addEventListener('submit', handlePasswordChange);
       document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -703,49 +741,43 @@
     }
 
     // ============================================================
-    // FACE AUTHENTICATION FLOW
+    // FACE AUTHENTICATION — NO EMP ID REQUIRED
     // ============================================================
 
-    // STEP 1: User clicks "Open Camera & Verify"
     async function startFaceAuth() {
-      const empId = document.getElementById('faceEmpId').value.trim();
-      if (!empId) {
-        showToast('Pehle Employee ID enter karein', 'error');
-        return;
-      }
-
-      // Show loading bar for model download
       const startBtn = document.getElementById('startFaceBtn');
       startBtn.disabled = true;
       startBtn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px;"></div> Please wait...';
-
       document.getElementById('modelLoadingBar').style.display = 'flex';
-      setModelProgress(10, 'Checking models...');
 
-      // Load face-api models if not already done
+      // 1. Load AI models
       if (!faceApiLoaded) {
+        setModelProgress(10, 'Loading AI Models...');
         const loaded = await loadFaceApiModels();
         if (!loaded) {
           startBtn.disabled = false;
-          startBtn.innerHTML = '<i class="fas fa-camera"></i> Open Camera & Verify';
+          startBtn.innerHTML = '<i class="fas fa-camera"></i> Start Face Scan';
           document.getElementById('modelLoadingBar').style.display = 'none';
           return;
         }
       }
 
-      setModelProgress(100, 'Ready!');
-      setTimeout(() => { document.getElementById('modelLoadingBar').style.display = 'none'; }, 600);
+      // 2. Load all employee face data from backend
+      if (!faceDataLoaded) {
+        setModelProgress(85, 'Employees ka face data load ho raha hai...');
+        await loadAllFaceDescriptors();
+      }
 
-      // Show step 2 (camera)
+      setModelProgress(100, 'Ready!');
+      setTimeout(() => { document.getElementById('modelLoadingBar').style.display = 'none'; }, 500);
+
+      // 3. Show camera step
       document.getElementById('faceStep1').style.display = 'none';
       document.getElementById('faceStep2').style.display = 'block';
-      document.getElementById('faceEmpIdDisplay').textContent = empId;
-
-      // Start camera
       await startCamera();
     }
 
-    // Load face-api.js models
+    // Load models
     async function loadFaceApiModels() {
       try {
         setModelProgress(20, 'Loading Face Detector...');
@@ -754,13 +786,42 @@
         await faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL);
         setModelProgress(80, 'Loading Recognition Model...');
         await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-        setModelProgress(100, 'Models Ready!');
         faceApiLoaded = true;
         return true;
       } catch (err) {
-        console.error('Model load error:', err);
         showToast('AI Models load nahi hue. Internet check karein.', 'error');
         return false;
+      }
+    }
+
+    // Fetch all employees' face data and pre-compute descriptors
+    async function loadAllFaceDescriptors() {
+      allFaceDescriptors = [];
+      try {
+        const result = await apiCall({ action: 'getAllFaceData' });
+        if (!result.success || !result.faces || result.faces.length === 0) {
+          showToast('Koi face data nahi mila. Admin se contact karein.', 'error');
+          return;
+        }
+
+        // Load each employee's stored photo and extract descriptor
+        const promises = result.faces.map(async (face) => {
+          const descriptor = await getDescriptorFromURL(face.photoURL);
+          if (descriptor) {
+            allFaceDescriptors.push({
+              empId: face.empId,
+              name: face.name,
+              photoURL: face.photoURL,
+              descriptor: descriptor
+            });
+          }
+        });
+
+        await Promise.all(promises);
+        faceDataLoaded = allFaceDescriptors.length > 0;
+        console.log(`Loaded ${allFaceDescriptors.length} face descriptors`);
+      } catch (e) {
+        console.error('Face data load error:', e);
       }
     }
 
@@ -780,20 +841,14 @@
         video.srcObject = cameraStream;
         await new Promise(res => { video.onloadedmetadata = res; });
         video.play();
-
         document.getElementById('cameraPlaceholder').style.display = 'none';
         video.style.display = 'block';
-        document.getElementById('faceOverlay').style.display = 'block';
-
-        // Setup overlay canvas
         const overlay = document.getElementById('faceOverlay');
+        overlay.style.display = 'block';
         overlay.width = video.videoWidth;
         overlay.height = video.videoHeight;
-
-        // Start live detection
         startLiveDetection();
       } catch (err) {
-        console.error('Camera error:', err);
         setFaceStatus('Camera access denied. Browser settings check karein.', 'error');
       }
     }
@@ -803,37 +858,29 @@
       const video = document.getElementById('faceVideo');
       const overlay = document.getElementById('faceOverlay');
       const ctx = overlay.getContext('2d');
-      const scanLine = document.getElementById('scanLine');
-      const ring = document.getElementById('scanRing');
-
-      scanLine.classList.add('active');
+      document.getElementById('scanLine').classList.add('active');
 
       faceDetectionInterval = setInterval(async () => {
         if (captureInProgress) return;
         ctx.clearRect(0, 0, overlay.width, overlay.height);
-
         try {
           const detection = await faceapi.detectSingleFace(
-            video,
-            new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
+            video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
           );
-
           if (detection) {
             faceDetected = true;
-            // Draw box
             const { x, y, width, height } = detection.box;
             ctx.strokeStyle = '#10B981';
             ctx.lineWidth = 2;
             ctx.strokeRect(x, y, width, height);
-
-            ring.className = 'scan-ring'; // reset
-            ring.style.borderColor = 'rgba(16,185,129,0.8)';
+            document.getElementById('scanRing').className = 'scan-ring';
+            document.getElementById('scanRing').style.borderColor = 'rgba(16,185,129,0.8)';
             document.getElementById('captureBtn').disabled = false;
             setFaceStatus('✓ Face detect ho gaya! "Verify Now" dabayein.', 'success');
           } else {
             faceDetected = false;
-            ring.className = 'scan-ring';
-            ring.style.borderColor = 'rgba(59,130,246,0.6)';
+            document.getElementById('scanRing').className = 'scan-ring';
+            document.getElementById('scanRing').style.borderColor = 'rgba(59,130,246,0.6)';
             document.getElementById('captureBtn').disabled = true;
             setFaceStatus('Camera ko seedha face ke saamne rakhein...', '');
           }
@@ -841,22 +888,22 @@
       }, 400);
     }
 
-    // STEP 2: Capture & Verify face
+    // VERIFY — compare against ALL employees
     async function captureFace() {
       if (!faceDetected || captureInProgress) return;
       captureInProgress = true;
 
-      const empId = document.getElementById('faceEmpId').value.trim();
       const video = document.getElementById('faceVideo');
       const ring = document.getElementById('scanRing');
 
-      // Animate scanning
       ring.className = 'scan-ring scanning';
       setFaceStatus('Face scan ho raha hai...', 'warning');
       document.getElementById('captureBtn').disabled = true;
+      // Hide reveal card during new scan
+      document.getElementById('empRevealCard').classList.remove('show');
 
       try {
-        // 1. Get live face descriptor
+        // Get live descriptor
         const liveDetection = await faceapi
           .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 }))
           .withFaceLandmarks(true)
@@ -865,111 +912,106 @@
         if (!liveDetection) {
           ring.className = 'scan-ring error';
           setFaceStatus('Face clearly capture nahi hua. Dobara try karein.', 'error');
-          captureInProgress = false;
-          document.getElementById('captureBtn').disabled = false;
+          resetCaptureState(2000);
           return;
         }
 
-        setFaceStatus('Employee data fetch ho raha hai...', 'warning');
-
-        // 2. Fetch stored photo from backend
-        const profileResult = await apiCall({ action: 'getEmployeeProfile', empId: empId });
-
-        if (!profileResult.success) {
+        if (allFaceDescriptors.length === 0) {
           ring.className = 'scan-ring error';
-          setFaceStatus('Employee ID nahi mila. ID check karein.', 'error');
-          captureInProgress = false;
-          document.getElementById('captureBtn').disabled = false;
+          setFaceStatus('Face data nahi mila. Admin se contact karein.', 'error');
+          resetCaptureState(2000);
           return;
         }
 
-        if (!profileResult.photoURL) {
-          // No photo stored — fallback to ID-only login (optional: can restrict)
-          ring.className = 'scan-ring error';
-          setFaceStatus('Face data register nahi hai. Admin se contact karein.', 'error');
-          captureInProgress = false;
-          document.getElementById('captureBtn').disabled = false;
-          return;
+        setFaceStatus('Match ho raha hai...', 'warning');
+
+        // Find best match among all employees
+        let bestMatch = null;
+        let bestDistance = Infinity;
+        const THRESHOLD = 0.55;
+
+        for (const emp of allFaceDescriptors) {
+          const distance = faceapi.euclideanDistance(liveDetection.descriptor, emp.descriptor);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestMatch = emp;
+          }
         }
 
-        setFaceStatus('Stored face se match ho raha hai...', 'warning');
+        console.log('Best match:', bestMatch?.empId, 'Distance:', bestDistance);
 
-        // 3. Load stored image and get its descriptor
-        const storedDescriptor = await getDescriptorFromURL(profileResult.photoURL);
-
-        if (!storedDescriptor) {
-          ring.className = 'scan-ring error';
-          setFaceStatus('Stored photo se face extract nahi hua. Admin se contact karein.', 'error');
-          captureInProgress = false;
-          document.getElementById('captureBtn').disabled = false;
-          return;
-        }
-
-        // 4. Compare descriptors (Euclidean distance)
-        const distance = faceapi.euclideanDistance(liveDetection.descriptor, storedDescriptor);
-        console.log('Face distance:', distance);
-
-        const THRESHOLD = 0.55; // Lower = stricter. 0.5-0.6 is typical
-
-        if (distance <= THRESHOLD) {
-          // ✅ MATCH!
+        if (bestMatch && bestDistance <= THRESHOLD) {
+          // ✅ MATCH FOUND
           ring.className = 'scan-ring success';
+
+          // Stop live detection while showing card
+          clearInterval(faceDetectionInterval);
+          document.getElementById('scanLine').classList.remove('active');
+
+          // Show employee reveal card
+          const avatarURL = bestMatch.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(bestMatch.name)}&size=200`;
+          document.getElementById('empRevealAvatar').src = avatarURL;
+          document.getElementById('empRevealName').textContent = bestMatch.name;
+          document.getElementById('empRevealId').textContent = '🪪 ' + bestMatch.empId;
+          document.getElementById('empRevealCard').classList.add('show');
+
           setFaceStatus('✓ Face verified! Logging in...', 'success');
 
-          // Check employee status via login endpoint (without password check)
-          const loginResult = await apiCall({
-            action: 'getEmployeeProfile',
-            empId: empId
-          });
+          // Fetch full profile
+          const profileResult = await apiCall({ action: 'getEmployeeProfile', empId: bestMatch.empId });
 
-          if (loginResult.success) {
-            const emp = loginResult.employee;
+          if (profileResult.success) {
+            const emp = profileResult.employee;
             if (emp.status !== 'Active') {
               ring.className = 'scan-ring error';
               setFaceStatus('Account inactive hai. Admin se contact karein.', 'error');
+              document.getElementById('empRevealCard').classList.remove('show');
               captureInProgress = false;
               return;
             }
-
             currentEmployee = emp;
             sessionStorage.setItem('punchbook_employee', JSON.stringify(currentEmployee));
-
             setTimeout(() => {
               stopCamera();
               showApp();
               showToast('Welcome back, ' + currentEmployee.name + '! 👋', 'success');
-            }, 800);
+            }, 1400);
           }
+
         } else {
           // ❌ NO MATCH
           ring.className = 'scan-ring error';
-          setFaceStatus(`Face match nahi hua (${(distance * 100).toFixed(0)}% difference). Dobara try karein.`, 'error');
-          captureInProgress = false;
-          setTimeout(() => {
-            ring.className = 'scan-ring';
-            ring.style.borderColor = 'rgba(59,130,246,0.6)';
-            document.getElementById('captureBtn').disabled = false;
-            setFaceStatus('Camera ko seedha face ke saamne rakhein...', '');
-          }, 2000);
+          const pct = bestDistance ? (bestDistance * 100).toFixed(0) : '??';
+          setFaceStatus(`Face kisi se match nahi hua. Dobara try karein.`, 'error');
+          resetCaptureState(2200);
         }
 
       } catch (err) {
         console.error('Face verify error:', err);
         ring.className = 'scan-ring error';
-        setFaceStatus('Error aaya: ' + err.message, 'error');
-        captureInProgress = false;
-        document.getElementById('captureBtn').disabled = false;
+        setFaceStatus('Error: ' + err.message, 'error');
+        resetCaptureState(2000);
       }
     }
 
-    // Load image from URL and extract face descriptor
+    function resetCaptureState(delay) {
+      setTimeout(() => {
+        captureInProgress = false;
+        document.getElementById('captureBtn').disabled = false;
+        document.getElementById('scanRing').className = 'scan-ring';
+        document.getElementById('scanRing').style.borderColor = 'rgba(59,130,246,0.6)';
+        setFaceStatus('Camera ko seedha face ke saamne rakhein...', '');
+        // Restart detection if stopped
+        if (!faceDetectionInterval || faceDetectionInterval._destroyed) startLiveDetection();
+      }, delay);
+    }
+
+    // Load stored photo → extract face descriptor
     async function getDescriptorFromURL(url) {
       return new Promise(async (resolve) => {
         try {
-          // Try loading image (CORS may block some Drive URLs)
           const img = new Image();
           img.crossOrigin = 'anonymous';
-          
           img.onload = async () => {
             try {
               const detection = await faceapi
@@ -977,32 +1019,18 @@
                 .withFaceLandmarks(true)
                 .withFaceDescriptor();
               resolve(detection ? detection.descriptor : null);
-            } catch (e) {
-              resolve(null);
-            }
+            } catch (e) { resolve(null); }
           };
-
-          img.onerror = () => {
-            // CORS fallback: try without crossOrigin (won't work for canvas but worth trying)
-            console.warn('Direct image load failed, trying proxy...');
-            resolve(null);
-          };
-
+          img.onerror = () => resolve(null);
           // Handle Google Drive URLs
           let loadUrl = url;
           if (url.includes('drive.google.com')) {
-            // Convert to direct download link
             const match = url.match(/[-\w]{25,}/);
-            if (match) {
-              loadUrl = `https://drive.google.com/uc?export=view&id=${match[0]}`;
-            }
+            if (match) loadUrl = `https://drive.google.com/uc?export=view&id=${match[0]}`;
           }
           img.src = loadUrl;
-
-          setTimeout(() => resolve(null), 10000); // 10s timeout
-        } catch (e) {
-          resolve(null);
-        }
+          setTimeout(() => resolve(null), 10000);
+        } catch (e) { resolve(null); }
       });
     }
 
@@ -1014,6 +1042,7 @@
 
     function stopCamera() {
       if (faceDetectionInterval) clearInterval(faceDetectionInterval);
+      faceDetectionInterval = null;
       if (cameraStream) {
         cameraStream.getTracks().forEach(t => t.stop());
         cameraStream = null;
@@ -1026,10 +1055,10 @@
       faceDetected = false;
       document.getElementById('faceStep1').style.display = 'block';
       document.getElementById('faceStep2').style.display = 'none';
+      document.getElementById('empRevealCard').classList.remove('show');
       const startBtn = document.getElementById('startFaceBtn');
       startBtn.disabled = false;
-      startBtn.innerHTML = '<i class="fas fa-camera"></i> Open Camera & Verify';
-      // Reset video element
+      startBtn.innerHTML = '<i class="fas fa-camera"></i> Start Face Scan';
       const video = document.getElementById('faceVideo');
       video.srcObject = null;
       video.style.display = 'none';
