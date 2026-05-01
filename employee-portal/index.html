@@ -176,6 +176,7 @@
     .badge-success { background: #D1FAE5; color: #059669; }
     .badge-warning { background: #FEF3C7; color: #D97706; }
     .badge-danger { background: #FEE2E2; color: #DC2626; }
+    .badge-purple { background: #EDE9FE; color: #7C3AED; }
     
     /* ================= PROFILE ================= */
     .profile-section { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -323,6 +324,8 @@
       <div class="tabs">
         <button class="tab-btn active" data-tab="dashboard"><i class="fas fa-home"></i> Dashboard</button>
         <button class="tab-btn" data-tab="attendance"><i class="fas fa-calendar"></i> Attendance</button>
+        <!-- NEW HOLIDAY TAB -->
+        <button class="tab-btn" data-tab="holiday"><i class="fas fa-umbrella-beach"></i> Holidays</button>
         <button class="tab-btn" data-tab="profile"><i class="fas fa-user"></i> Profile</button>
         <button class="tab-btn" data-tab="settings"><i class="fas fa-cog"></i> Settings</button>
       </div>
@@ -389,6 +392,29 @@
         </div>
       </div>
 
+      <!-- NEW HOLIDAY TAB CONTENT -->
+      <div class="tab-content" id="holidayTab">
+        <div class="stats-section">
+          <div class="stats-header">
+            <h3><i class="fas fa-umbrella-beach"></i> Company Holidays</h3>
+          </div>
+          <div class="attendance-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Day</th>
+                  <th>Holiday Name</th>
+                </tr>
+              </thead>
+              <tbody id="holidayTable">
+                <tr><td colspan="3" class="loading"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <div class="tab-content" id="profileTab">
         <div class="profile-section">
           <div class="profile-header">
@@ -410,7 +436,7 @@
         </div>
       </div>
 
-      <!-- SETTINGS TAB (UPDATED FOR ADMIN STYLE FACE CAPTURE) -->
+      <!-- SETTINGS TAB -->
       <div class="tab-content" id="settingsTab">
         <div class="settings-grid">
           
@@ -539,18 +565,19 @@
     });
 
     function switchTab(tab) {
-      // Jab user Settings tab se bahar jaye toh camera automatically band ho jaye
       if (tab !== 'settings') { stopSettingsFaceCamera(); }
 
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById(tab + 'Tab').classList.add('active');
+      
       if (tab === 'attendance') loadAttendance();
+      if (tab === 'holiday') loadHolidays(); // NEW HOLIDAY LOAD
     }
 
     // ==============================================================
-    // NEW: SETTINGS LIVE FACE CAPTURE (Matches Admin Panel)
+    // SETTINGS LIVE FACE CAPTURE
     // ==============================================================
     async function startSettingsFaceCamera() {
       const btn = document.getElementById('btnStartSettingsCam');
@@ -566,7 +593,6 @@
       document.getElementById('settingsCapturedPhoto').style.display = 'none';
 
       try {
-        // Load all 3 models required for Face Recognition (just like Admin Panel)
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
           faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
@@ -629,17 +655,14 @@
       const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
       
       if (detection) {
-        // Extract 128-d descriptor array
         settingsFaceDescriptor = Array.from(detection.descriptor);
         
-        // Capture Photo base64
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = video.videoWidth;
         tempCanvas.height = video.videoHeight;
         tempCanvas.getContext('2d').drawImage(video, 0, 0);
         settingsPhotoBase64 = tempCanvas.toDataURL('image/jpeg', 0.85);
         
-        // Update UI
         document.getElementById('settingsCapturedPhoto').src = settingsPhotoBase64;
         document.getElementById('settingsCapturedPhoto').style.display = 'block';
         document.getElementById('settingsVideoContainer').style.display = 'none';
@@ -668,16 +691,15 @@
           action: 'saveFaceData',
           empId: currentEmployee.empId,
           empName: currentEmployee.name,
-          faceDescriptor: JSON.stringify(settingsFaceDescriptor), // Direct array to string
+          faceDescriptor: JSON.stringify(settingsFaceDescriptor), 
           photoBase64: settingsPhotoBase64
         });
 
         if (result.success) {
           showToast('Face Registration Successful!', 'success');
           stopSettingsFaceCamera();
-          faceDataLoaded = false; // Force reload next time login happens
+          faceDataLoaded = false; 
           
-          // Update profile avatars visually
           document.getElementById('headerAvatar').src = settingsPhotoBase64;
           document.getElementById('profileAvatar').src = settingsPhotoBase64;
         } else {
@@ -760,7 +782,6 @@
         setModelProgress(20, 'Loading Face Detector...');
         await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
         setModelProgress(55, 'Loading Landmark Model...');
-        // We load the main 68Net to match the Admin Panel exactly
         await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL); 
         setModelProgress(80, 'Loading Recognition Model...');
         await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
@@ -772,7 +793,6 @@
       }
     }
 
-    // UPDATED: Now it uses the direct JSON descriptor from the backend (SUPER FAST!)
     async function loadAllFaceDescriptors() {
       allFaceDescriptors = [];
       try {
@@ -781,11 +801,9 @@
         
         const promises = result.faces.map(async (face) => {
           let descriptor = null;
-          // Agar backend se array milla hai (direct database se)
           if (face.faceDescriptor && face.faceDescriptor.length === 128) {
             descriptor = new Float32Array(face.faceDescriptor);
           } else if (face.photoURL) {
-            // Fallback: load photo via URL
             descriptor = await getDescriptorFromURL(face.photoURL);
           }
           
@@ -1033,6 +1051,30 @@
     async function loadRecentActivity() {
       const result = await apiCall({ action: 'getRecentActivity', empId: currentEmployee.empId, limit: 5 });
       if (result.success) renderAttendanceTable(result.records, 'recentActivityTable');
+    }
+
+    // NEW FUNCTION TO LOAD HOLIDAYS
+    async function loadHolidays() {
+      const tbody = document.getElementById('holidayTable');
+      tbody.innerHTML = '<tr><td colspan="3" class="loading"><div class="spinner"></div></td></tr>';
+      
+      const result = await apiCall({ action: 'getHolidaysList' });
+      
+      if (result.success) {
+        if (result.holidays.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" class="empty-state"><i class="fas fa-umbrella-beach"></i><p>No holidays found</p></td></tr>';
+          return;
+        }
+        tbody.innerHTML = result.holidays.map(h => {
+          return `<tr>
+            <td><strong>${h.dateStr}</strong></td>
+            <td>${h.dayName}</td>
+            <td><span class="badge badge-purple">${h.name}</span></td>
+          </tr>`;
+        }).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="3" class="empty-state"><p>Error loading holidays.</p></td></tr>`;
+      }
     }
 
     function renderAttendanceTable(records, tableId) {
