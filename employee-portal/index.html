@@ -117,7 +117,6 @@
     #faceLoginSection { display: none; }
     #passwordLoginSection { display: block; }
 
-    /* Employee reveal card - shown after face match */
     .emp-reveal-card {
       display: none;
       background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
@@ -158,14 +157,12 @@
       margin-bottom: 16px;
       border: 2px solid var(--gray-200);
     }
-
     .face-scan-area video {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transform: scaleX(-1); /* Mirror effect */
+      transform: scaleX(-1);
     }
-
     .face-scan-area canvas.overlay {
       position: absolute;
       top: 0; left: 0;
@@ -174,7 +171,6 @@
       transform: scaleX(-1);
     }
 
-    /* Scan ring animation */
     .scan-ring {
       position: absolute;
       top: 50%; left: 50%;
@@ -198,133 +194,42 @@
       50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
     }
 
-    .scan-ring.scanning {
-      border-color: var(--warning);
-      animation: scanRotate 1s linear infinite;
-    }
-    @keyframes scanRotate {
-      from { transform: translate(-50%, -50%) rotate(0deg); }
-      to { transform: translate(-50%, -50%) rotate(360deg); }
-    }
+    .scan-ring.scanning { border-color: var(--warning); animation: scanRotate 1s linear infinite; }
+    @keyframes scanRotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+    .scan-ring.success { border-color: var(--success); animation: scanSuccess 0.5s ease forwards; }
+    @keyframes scanSuccess { 0% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.15); } 100% { transform: translate(-50%, -50%) scale(1); } }
+    .scan-ring.error { border-color: var(--danger); animation: scanShake 0.4s ease forwards; }
+    @keyframes scanShake { 0%, 100% { transform: translate(-50%, -50%); } 25% { transform: translate(calc(-50% - 6px), -50%); } 75% { transform: translate(calc(-50% + 6px), -50%); } }
 
-    .scan-ring.success {
-      border-color: var(--success);
-      animation: scanSuccess 0.5s ease forwards;
-    }
-    @keyframes scanSuccess {
-      0% { transform: translate(-50%, -50%) scale(1); }
-      50% { transform: translate(-50%, -50%) scale(1.15); }
-      100% { transform: translate(-50%, -50%) scale(1); }
-    }
-
-    .scan-ring.error {
-      border-color: var(--danger);
-      animation: scanShake 0.4s ease forwards;
-    }
-    @keyframes scanShake {
-      0%, 100% { transform: translate(-50%, -50%); }
-      25% { transform: translate(calc(-50% - 6px), -50%); }
-      75% { transform: translate(calc(-50% + 6px), -50%); }
-    }
-
-    /* Corner guides */
-    .face-guide-corner {
-      position: absolute;
-      width: 24px; height: 24px;
-      border-color: rgba(59,130,246,0.8);
-      border-style: solid;
-      z-index: 6;
-    }
+    .face-guide-corner { position: absolute; width: 24px; height: 24px; border-color: rgba(59,130,246,0.8); border-style: solid; z-index: 6; }
     .fgc-tl { top: 16px; left: 16px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
     .fgc-tr { top: 16px; right: 16px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
     .fgc-bl { bottom: 16px; left: 16px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
     .fgc-br { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
 
-    /* Scan line */
-    .scan-line {
-      position: absolute;
-      left: 10%; right: 10%;
-      height: 2px;
-      background: linear-gradient(to right, transparent, rgba(59,130,246,0.8), transparent);
-      z-index: 6;
-      animation: scanLineMove 2s ease-in-out infinite;
-      display: none;
-    }
+    .scan-line { position: absolute; left: 10%; right: 10%; height: 2px; background: linear-gradient(to right, transparent, rgba(59,130,246,0.8), transparent); z-index: 6; animation: scanLineMove 2s ease-in-out infinite; display: none; }
     .scan-line.active { display: block; }
-    @keyframes scanLineMove {
-      0% { top: 15%; }
-      50% { top: 85%; }
-      100% { top: 15%; }
-    }
+    @keyframes scanLineMove { 0% { top: 15%; } 50% { top: 85%; } 100% { top: 15%; } }
 
-    .face-status-msg {
-      text-align: center;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--gray-700);
-      margin-bottom: 12px;
-      min-height: 20px;
-    }
+    .face-status-msg { text-align: center; font-size: 13px; font-weight: 500; color: var(--gray-700); margin-bottom: 12px; min-height: 20px; }
     .face-status-msg.success { color: var(--success); }
     .face-status-msg.error { color: var(--danger); }
     .face-status-msg.warning { color: var(--warning); }
 
-    /* Camera OFF placeholder */
-    .camera-placeholder {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255,255,255,0.5);
-      gap: 10px;
-      font-size: 13px;
-    }
+    .camera-placeholder { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); gap: 10px; font-size: 13px; }
     .camera-placeholder i { font-size: 36px; }
 
-    /* Model loading bar */
-    .model-loading-bar {
-      background: var(--gray-100);
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 14px;
-      font-size: 13px;
-      color: var(--gray-500);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .model-loading-bar .bar-track {
-      flex: 1;
-      height: 4px;
-      background: var(--gray-200);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .model-loading-bar .bar-fill {
-      height: 100%;
-      background: var(--primary);
-      border-radius: 4px;
-      width: 0%;
-      transition: width 0.4s ease;
-    }
+    .model-loading-bar { background: var(--gray-100); border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; font-size: 13px; color: var(--gray-500); display: flex; align-items: center; gap: 10px; }
+    .model-loading-bar .bar-track { flex: 1; height: 4px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+    .model-loading-bar .bar-fill { height: 100%; background: var(--primary); border-radius: 4px; width: 0%; transition: width 0.4s ease; }
 
     /* ================= APP LAYOUT ================= */
     .app-container { display: none; }
-    
-    .app-header {
-      background: white; padding: 16px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
-    }
-    
-    .header-content {
-      max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;
-    }
-    
+    .app-header { background: white; padding: 16px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+    .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
     .header-logo { display: flex; align-items: center; gap: 12px; }
     .header-logo img { width: 60px; height: 60px; object-fit: contain; }
     .header-logo h1 { font-size: 18px; color: var(--gray-900); }
-    
     .header-user { display: flex; align-items: center; gap: 12px; }
     .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
     .user-name { font-weight: 600; color: var(--gray-900); font-size: 14px; }
@@ -342,7 +247,7 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     
-    /* ================= DASHBOARD ================= */
+    /* ================= DASHBOARD & TABLES ================= */
     .today-status { background: linear-gradient(135deg, #1e40af 0%, #3B82F6 100%); border-radius: 16px; padding: 24px; margin-bottom: 24px; color: white; }
     .today-status h3 { font-size: 14px; opacity: 0.9; margin-bottom: 16px; }
     .today-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -371,7 +276,6 @@
     .stat-card .stat-value.purple { color: var(--purple); }
     .stat-card .stat-label { color: var(--gray-500); font-size: 12px; }
     
-    /* ================= TABLES ================= */
     .attendance-table { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; min-width: 500px; }
     th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--gray-200); font-size: 14px; }
@@ -393,10 +297,33 @@
     .profile-detail .label { color: var(--gray-500); font-size: 12px; margin-bottom: 4px; }
     .profile-detail .value { color: var(--gray-900); font-weight: 600; font-size: 14px; }
     
-    /* ================= SETTINGS ================= */
-    .settings-section { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .settings-section h3 { font-size: 16px; color: var(--gray-900); margin-bottom: 20px; }
-    .settings-form { max-width: 400px; }
+    /* ================= SETTINGS GRID (NEW) ================= */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .settings-card {
+      background: white; 
+      border-radius: 16px; 
+      padding: 24px; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .settings-card h3 { font-size: 16px; color: var(--gray-900); margin-bottom: 8px; }
+    .settings-card p.desc { font-size: 13px; color: var(--gray-500); margin-bottom: 16px; line-height: 1.4; }
+    
+    .update-face-area {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0f172a;
+      margin-bottom: 16px;
+      border: 2px solid var(--gray-200);
+    }
+    .update-face-area video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
     
     /* ================= TOAST ================= */
     .toast { position: fixed; bottom: 24px; right: 24px; padding: 16px 24px; background: var(--gray-900); color: white; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 2000; display: none; }
@@ -416,7 +343,7 @@
     @media (max-width: 768px) {
       .app-header { padding: 12px 16px; }
       .main-content { padding: 16px; }
-      .profile-section, .today-status, .stats-section, .settings-section { padding: 16px; }
+      .profile-section, .today-status, .stats-section, .settings-card { padding: 16px; }
       .stats-row-1, .stats-row-2 { grid-template-columns: repeat(2, 1fr); }
       .today-grid { grid-template-columns: 1fr; gap: 12px; } 
       .profile-header { flex-direction: column; text-align: center; }
@@ -424,6 +351,7 @@
       .stats-header { flex-direction: column; gap: 12px; align-items: flex-start; }
       .month-selector { width: 100%; } 
       .login-box { padding: 60px 20px 30px; margin-top: 40px; }
+      .settings-grid { grid-template-columns: 1fr; } /* Stack on mobile */
     }
     @media (max-width: 480px) {
       .header-logo h1 { display: none; }
@@ -433,66 +361,44 @@
 </head>
 <body>
 
-  <!-- ================= LOGIN PAGE ================= -->
+  <!-- ================= LOGIN PAGE (No changes) ================= -->
   <div class="login-container" id="loginPage">
     <div class="login-box">
-      <div class="logo-container">
-        <img src="punchbook_logo.png" alt="Punch Book" class="logo">
-      </div>
-      <div class="login-logo">
-        <h1>Punch Book</h1>
-        <p>Employee Self-Service Portal</p>
-      </div>
+      <div class="logo-container"><img src="punchbook_logo.png" alt="Punch Book" class="logo"></div>
+      <div class="login-logo"><h1>Punch Book</h1><p>Employee Self-Service Portal</p></div>
 
-      <!-- Login Mode Tabs -->
       <div class="login-tabs">
-        <button class="login-tab-btn active" onclick="switchLoginMode('face')" id="faceTabBtn">
-          <i class="fas fa-camera"></i> Face Login
-        </button>
-        <button class="login-tab-btn" onclick="switchLoginMode('password')" id="passTabBtn">
-          <i class="fas fa-key"></i> Password
-        </button>
+        <button class="login-tab-btn active" onclick="switchLoginMode('face')" id="faceTabBtn"><i class="fas fa-camera"></i> Face Login</button>
+        <button class="login-tab-btn" onclick="switchLoginMode('password')" id="passTabBtn"><i class="fas fa-key"></i> Password</button>
       </div>
 
-      <!-- ====== FACE LOGIN ====== -->
+      <!-- FACE LOGIN -->
       <div id="faceLoginSection">
-
-        <!-- Step 1: Just a button to start -->
         <div id="faceStep1">
           <div style="text-align:center; padding: 8px 0 16px;">
             <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#dbeafe,#eff6ff);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
               <i class="fas fa-face-smile" style="font-size:28px;color:var(--primary);"></i>
             </div>
-            <p style="font-size:13px;color:var(--gray-500);margin-bottom:0;">Camera se apna face scan karein — ID ki zaroorat nahi</p>
+            <p style="font-size:13px;color:var(--gray-500);margin-bottom:0;">Camera se apna face scan karein</p>
           </div>
-          <button class="btn btn-primary" onclick="startFaceAuth()" id="startFaceBtn">
-            <i class="fas fa-camera"></i> Start Face Scan
-          </button>
-          <!-- Model loading progress -->
+          <button class="btn btn-primary" onclick="startFaceAuth()" id="startFaceBtn"><i class="fas fa-camera"></i> Start Face Scan</button>
           <div class="model-loading-bar" id="modelLoadingBar" style="display:none; margin-top:12px;">
             <span id="modelLoadingText">Loading AI Models...</span>
             <div class="bar-track"><div class="bar-fill" id="modelBarFill"></div></div>
           </div>
         </div>
 
-        <!-- Step 2: Camera + Scan -->
         <div id="faceStep2" style="display:none;">
           <div class="face-scan-area" id="faceScanArea">
-            <div class="camera-placeholder" id="cameraPlaceholder">
-              <i class="fas fa-camera-slash"></i>
-              <span>Camera loading...</span>
-            </div>
+            <div class="camera-placeholder" id="cameraPlaceholder"><i class="fas fa-camera-slash"></i><span>Camera loading...</span></div>
             <video id="faceVideo" autoplay muted playsinline style="display:none;"></video>
             <canvas id="faceOverlay" class="overlay" style="display:none;"></canvas>
-            <div class="face-guide-corner fgc-tl"></div>
-            <div class="face-guide-corner fgc-tr"></div>
-            <div class="face-guide-corner fgc-bl"></div>
-            <div class="face-guide-corner fgc-br"></div>
+            <div class="face-guide-corner fgc-tl"></div><div class="face-guide-corner fgc-tr"></div>
+            <div class="face-guide-corner fgc-bl"></div><div class="face-guide-corner fgc-br"></div>
             <div class="scan-ring" id="scanRing"></div>
             <div class="scan-line" id="scanLine"></div>
           </div>
 
-          <!-- Employee Reveal Card (shown after match) -->
           <div class="emp-reveal-card" id="empRevealCard">
             <img class="emp-reveal-avatar" id="empRevealAvatar" src="">
             <div class="emp-reveal-info">
@@ -505,33 +411,20 @@
           <div class="face-status-msg" id="faceStatusMsg">Camera ko seedha face ke saamne rakhein...</div>
 
           <div style="display:flex; gap:10px; margin-bottom:12px;">
-            <button class="btn btn-primary" onclick="captureFace()" id="captureBtn" style="flex:1;" disabled>
-              <i class="fas fa-fingerprint"></i> Verify Now
-            </button>
-            <button class="btn btn-secondary" onclick="cancelFaceAuth()" style="padding: 12px 18px;">
-              <i class="fas fa-times"></i>
-            </button>
+            <button class="btn btn-primary" onclick="captureFace()" id="captureBtn" style="flex:1;" disabled><i class="fas fa-fingerprint"></i> Verify Now</button>
+            <button class="btn btn-secondary" onclick="cancelFaceAuth()" style="padding: 12px 18px;"><i class="fas fa-times"></i></button>
           </div>
         </div>
       </div>
 
-      <!-- ====== PASSWORD LOGIN ====== -->
+      <!-- PASSWORD LOGIN -->
       <div id="passwordLoginSection" style="display:none;">
         <form id="loginForm">
-          <div class="form-group">
-            <label>Employee ID</label>
-            <input type="text" id="loginEmpId" placeholder="MC1234" required>
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="loginPassword" placeholder="Enter your password" required>
-          </div>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-sign-in-alt"></i> Login
-          </button>
+          <div class="form-group"><label>Employee ID</label><input type="text" id="loginEmpId" placeholder="MC1234" required></div>
+          <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter your password" required></div>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</button>
         </form>
       </div>
-
     </div>
   </div>
 
@@ -540,16 +433,11 @@
     
     <header class="app-header">
       <div class="header-content">
-        <div class="header-logo">
-          <img src="punchbook_logo.png" alt="Punch Book">
-          <h1>Punch Book</h1>
-        </div>
+        <div class="header-logo"><img src="punchbook_logo.png" alt="Punch Book"><h1>Punch Book</h1></div>
         <div class="header-user">
           <img class="user-avatar" id="headerAvatar" src="">
           <span class="user-name" id="headerName">Employee</span>
-          <button class="logout-btn" onclick="logout()" title="Logout">
-            <i class="fas fa-sign-out-alt"></i>
-          </button>
+          <button class="logout-btn" onclick="logout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
         </div>
       </div>
     </header>
@@ -567,18 +455,9 @@
         <div class="today-status">
           <h3><i class="fas fa-clock"></i> Today's Status - <span id="todayDate"></span></h3>
           <div class="today-grid">
-            <div class="today-item">
-              <div class="time" id="todayPunchIn">--:--</div>
-              <div class="label">Punch In</div>
-            </div>
-            <div class="today-item">
-              <div class="time" id="todayPunchOut">--:--</div>
-              <div class="label">Punch Out</div>
-            </div>
-            <div class="today-item">
-              <div class="time" id="todayHours">--</div>
-              <div class="label">Work Hours</div>
-            </div>
+            <div class="today-item"><div class="time" id="todayPunchIn">--:--</div><div class="label">Punch In</div></div>
+            <div class="today-item"><div class="time" id="todayPunchOut">--:--</div><div class="label">Punch Out</div></div>
+            <div class="today-item"><div class="time" id="todayHours">--</div><div class="label">Work Hours</div></div>
           </div>
           <span class="today-badge" id="todayBadge">Not Punched</span>
         </div>
@@ -657,16 +536,48 @@
         </div>
       </div>
 
-      <!-- SETTINGS TAB -->
+      <!-- SETTINGS TAB (UPDATED TO GRID) -->
       <div class="tab-content" id="settingsTab">
-        <div class="settings-section">
-          <h3>Change Password</h3>
-          <form class="settings-form" id="passwordForm">
-            <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" required></div>
-            <div class="form-group"><label>New Password</label><input type="password" id="newPassword" required minlength="6"></div>
-            <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmPassword" required minlength="6"></div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Change Password</button>
-          </form>
+        <div class="settings-grid">
+          
+          <!-- LEFT: Update Face Data -->
+          <div class="settings-card">
+            <h3><i class="fas fa-camera-rotate"></i> Update Face Data</h3>
+            <p class="desc">Naya face data capture karein. Ye FaceData sheet mein automatically update ho jayega.</p>
+            
+            <div class="update-face-area" id="settingsFaceArea">
+              <div class="camera-placeholder" id="settingsCameraPlaceholder">
+                <i class="fas fa-camera-slash"></i>
+                <span>Camera Off</span>
+              </div>
+              <video id="settingsFaceVideo" autoplay muted playsinline style="display:none;"></video>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-outline" onclick="startSettingsCamera()" id="btnStartSettingsCam">
+                <i class="fas fa-video"></i> Start Camera
+              </button>
+              <button class="btn btn-primary" onclick="captureAndUploadFace()" id="btnCaptureSettingsCam" style="display:none; flex:1;">
+                <i class="fas fa-cloud-upload-alt"></i> Update Face
+              </button>
+              <button class="btn btn-secondary" onclick="stopSettingsCamera()" id="btnStopSettingsCam" style="display:none; padding: 12px 18px;">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- RIGHT: Change Password -->
+          <div class="settings-card">
+            <h3><i class="fas fa-key"></i> Change Password</h3>
+            <p class="desc">Apne employee account ka naya password set karein.</p>
+            <form class="settings-form" id="passwordForm" style="max-width:100%;">
+              <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" required></div>
+              <div class="form-group"><label>New Password</label><input type="password" id="newPassword" required minlength="6"></div>
+              <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmPassword" required minlength="6"></div>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            </form>
+          </div>
+
         </div>
       </div>
     </main>
@@ -675,23 +586,17 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    // ============================================================
-    // ⚠️ YAHAN APNE EMPLOYEE PORTAL WALE APPS SCRIPT KI URL DAALEIN
-    // ============================================================
     const API_URL = 'https://script.google.com/macros/s/AKfycbxPxRUqdubBd2xkGH1vSMq7tDzN1Zg_ABdY88etLy0f1KMKwCmas7to_XbI7WrpwHsk/exec'; 
-    // ============================================================
-
     const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model';
 
     let currentEmployee = null;
     let cameraStream = null;
+    let settingsStream = null; // New stream specifically for Settings Tab
     let faceApiLoaded = false;
     let faceDetectionInterval = null;
     let faceDetected = false;
     let captureInProgress = false;
 
-    // All employee face descriptors loaded from backend
-    // Format: [ { empId, name, photoURL, descriptor: Float32Array } ]
     let allFaceDescriptors = [];
     let faceDataLoaded = false;
 
@@ -699,7 +604,8 @@
     async function apiCall(params) {
       try {
         let response;
-        if (params.action === 'changePassword') {
+        // Sending POST request for updating face or changing password
+        if (params.action === 'changePassword' || params.action === 'updateEmployeeFace') {
           response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -731,7 +637,105 @@
       });
     });
 
-    // ============ LOGIN MODE TOGGLE ============
+    // ============ TABS ============
+    function switchTab(tab) {
+      // Jab user Settings tab se dusre tab me jaye, camera band ho jaye
+      if (tab !== 'settings') { stopSettingsCamera(); }
+
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(tab + 'Tab').classList.add('active');
+      if (tab === 'attendance') loadAttendance();
+    }
+
+    // ============ SETTINGS FACE UPDATE FUNCTIONS ============
+    async function startSettingsCamera() {
+      try {
+        settingsStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+          audio: false
+        });
+        const video = document.getElementById('settingsFaceVideo');
+        video.srcObject = settingsStream;
+        video.style.display = 'block';
+        document.getElementById('settingsCameraPlaceholder').style.display = 'none';
+
+        document.getElementById('btnStartSettingsCam').style.display = 'none';
+        document.getElementById('btnCaptureSettingsCam').style.display = 'block';
+        document.getElementById('btnStopSettingsCam').style.display = 'block';
+      } catch (err) {
+        showToast('Camera access denied. Browser settings check karein.', 'error');
+      }
+    }
+
+    function stopSettingsCamera() {
+      if (settingsStream) {
+        settingsStream.getTracks().forEach(t => t.stop());
+        settingsStream = null;
+      }
+      const video = document.getElementById('settingsFaceVideo');
+      video.srcObject = null;
+      video.style.display = 'none';
+      document.getElementById('settingsCameraPlaceholder').style.display = 'flex';
+      
+      document.getElementById('btnStartSettingsCam').style.display = 'block';
+      document.getElementById('btnCaptureSettingsCam').style.display = 'none';
+      document.getElementById('btnStopSettingsCam').style.display = 'none';
+    }
+
+    async function captureAndUploadFace() {
+      const video = document.getElementById('settingsFaceVideo');
+      if (!settingsStream || video.style.display === 'none') return;
+
+      const btn = document.getElementById('btnCaptureSettingsCam');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;border-top-color:white;"></div> Uploading...';
+
+      // 1. Draw video frame to hidden canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // 2. Convert to Base64
+      const base64Data = canvas.toDataURL('image/jpeg', 0.85);
+
+      try {
+        // 3. Send to Google Apps Script
+        const result = await apiCall({ 
+          action: 'updateEmployeeFace', 
+          empId: currentEmployee.empId, 
+          imageBase64: base64Data 
+        });
+
+        if (result.success) {
+          showToast('Face data successfully updated!', 'success');
+          stopSettingsCamera();
+          faceDataLoaded = false; // Agli baar login par naya face load hoga
+          
+          // Agar nayi photo ki URL aayi ho toh profile pic update kar de
+          if (result.photoURL) {
+            document.getElementById('headerAvatar').src = result.photoURL;
+            document.getElementById('profileAvatar').src = result.photoURL;
+          }
+        } else {
+          showToast('Failed: ' + result.message, 'error');
+        }
+      } catch (error) {
+        showToast('Upload error. Internet check karein.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Update Face';
+      }
+    }
+
+
+    /* =========================================================
+       SARA PURANA LOGIC NICHE WAISE HI HAI (No breaking changes)
+       ========================================================= */
+
     function switchLoginMode(mode) {
       document.getElementById('faceTabBtn').classList.toggle('active', mode === 'face');
       document.getElementById('passTabBtn').classList.toggle('active', mode === 'password');
@@ -740,17 +744,12 @@
       if (mode !== 'face') cancelFaceAuth();
     }
 
-    // ============================================================
-    // FACE AUTHENTICATION — NO EMP ID REQUIRED
-    // ============================================================
-
     async function startFaceAuth() {
       const startBtn = document.getElementById('startFaceBtn');
       startBtn.disabled = true;
       startBtn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px;"></div> Please wait...';
       document.getElementById('modelLoadingBar').style.display = 'flex';
 
-      // 1. Load AI models
       if (!faceApiLoaded) {
         setModelProgress(10, 'Loading AI Models...');
         const loaded = await loadFaceApiModels();
@@ -762,7 +761,6 @@
         }
       }
 
-      // 2. Load all employee face data from backend
       if (!faceDataLoaded) {
         setModelProgress(85, 'Employees ka face data load ho raha hai...');
         await loadAllFaceDescriptors();
@@ -771,13 +769,11 @@
       setModelProgress(100, 'Ready!');
       setTimeout(() => { document.getElementById('modelLoadingBar').style.display = 'none'; }, 500);
 
-      // 3. Show camera step
       document.getElementById('faceStep1').style.display = 'none';
       document.getElementById('faceStep2').style.display = 'block';
       await startCamera();
     }
 
-    // Load models
     async function loadFaceApiModels() {
       try {
         setModelProgress(20, 'Loading Face Detector...');
@@ -794,35 +790,18 @@
       }
     }
 
-    // Fetch all employees' face data and pre-compute descriptors
     async function loadAllFaceDescriptors() {
       allFaceDescriptors = [];
       try {
         const result = await apiCall({ action: 'getAllFaceData' });
-        if (!result.success || !result.faces || result.faces.length === 0) {
-          showToast('Koi face data nahi mila. Admin se contact karein.', 'error');
-          return;
-        }
-
-        // Load each employee's stored photo and extract descriptor
+        if (!result.success || !result.faces || result.faces.length === 0) return;
         const promises = result.faces.map(async (face) => {
           const descriptor = await getDescriptorFromURL(face.photoURL);
-          if (descriptor) {
-            allFaceDescriptors.push({
-              empId: face.empId,
-              name: face.name,
-              photoURL: face.photoURL,
-              descriptor: descriptor
-            });
-          }
+          if (descriptor) allFaceDescriptors.push({ empId: face.empId, name: face.name, photoURL: face.photoURL, descriptor: descriptor });
         });
-
         await Promise.all(promises);
         faceDataLoaded = allFaceDescriptors.length > 0;
-        console.log(`Loaded ${allFaceDescriptors.length} face descriptors`);
-      } catch (e) {
-        console.error('Face data load error:', e);
-      }
+      } catch (e) {}
     }
 
     function setModelProgress(pct, text) {
@@ -830,13 +809,9 @@
       document.getElementById('modelLoadingText').textContent = text;
     }
 
-    // Start webcam
     async function startCamera() {
       try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
-          audio: false
-        });
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }, audio: false });
         const video = document.getElementById('faceVideo');
         video.srcObject = cameraStream;
         await new Promise(res => { video.onloadedmetadata = res; });
@@ -849,11 +824,10 @@
         overlay.height = video.videoHeight;
         startLiveDetection();
       } catch (err) {
-        setFaceStatus('Camera access denied. Browser settings check karein.', 'error');
+        setFaceStatus('Camera access denied.', 'error');
       }
     }
 
-    // Live face detection loop
     function startLiveDetection() {
       const video = document.getElementById('faceVideo');
       const overlay = document.getElementById('faceOverlay');
@@ -864,15 +838,11 @@
         if (captureInProgress) return;
         ctx.clearRect(0, 0, overlay.width, overlay.height);
         try {
-          const detection = await faceapi.detectSingleFace(
-            video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
-          );
+          const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 }));
           if (detection) {
             faceDetected = true;
             const { x, y, width, height } = detection.box;
-            ctx.strokeStyle = '#10B981';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(x, y, width, height);
+            ctx.strokeStyle = '#10B981'; ctx.lineWidth = 2; ctx.strokeRect(x, y, width, height);
             document.getElementById('scanRing').className = 'scan-ring';
             document.getElementById('scanRing').style.borderColor = 'rgba(16,185,129,0.8)';
             document.getElementById('captureBtn').disabled = false;
@@ -884,315 +854,185 @@
             document.getElementById('captureBtn').disabled = true;
             setFaceStatus('Camera ko seedha face ke saamne rakhein...', '');
           }
-        } catch (e) { /* ignore frame errors */ }
+        } catch (e) { }
       }, 400);
     }
 
-    // VERIFY — compare against ALL employees
     async function captureFace() {
       if (!faceDetected || captureInProgress) return;
       captureInProgress = true;
-
       const video = document.getElementById('faceVideo');
       const ring = document.getElementById('scanRing');
 
       ring.className = 'scan-ring scanning';
       setFaceStatus('Face scan ho raha hai...', 'warning');
       document.getElementById('captureBtn').disabled = true;
-      // Hide reveal card during new scan
       document.getElementById('empRevealCard').classList.remove('show');
 
       try {
-        // Get live descriptor
-        const liveDetection = await faceapi
-          .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 }))
-          .withFaceLandmarks(true)
-          .withFaceDescriptor();
+        const liveDetection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })).withFaceLandmarks(true).withFaceDescriptor();
 
         if (!liveDetection) {
           ring.className = 'scan-ring error';
           setFaceStatus('Face clearly capture nahi hua. Dobara try karein.', 'error');
-          resetCaptureState(2000);
-          return;
+          resetCaptureState(2000); return;
         }
 
         if (allFaceDescriptors.length === 0) {
           ring.className = 'scan-ring error';
           setFaceStatus('Face data nahi mila. Admin se contact karein.', 'error');
-          resetCaptureState(2000);
-          return;
+          resetCaptureState(2000); return;
         }
 
-        setFaceStatus('Match ho raha hai...', 'warning');
-
-        // Find best match among all employees
-        let bestMatch = null;
-        let bestDistance = Infinity;
-        const THRESHOLD = 0.55;
+        let bestMatch = null; let bestDistance = Infinity; const THRESHOLD = 0.55;
 
         for (const emp of allFaceDescriptors) {
           const distance = faceapi.euclideanDistance(liveDetection.descriptor, emp.descriptor);
-          if (distance < bestDistance) {
-            bestDistance = distance;
-            bestMatch = emp;
-          }
+          if (distance < bestDistance) { bestDistance = distance; bestMatch = emp; }
         }
 
-        console.log('Best match:', bestMatch?.empId, 'Distance:', bestDistance);
-
         if (bestMatch && bestDistance <= THRESHOLD) {
-          // ✅ MATCH FOUND
           ring.className = 'scan-ring success';
-
-          // Stop live detection while showing card
           clearInterval(faceDetectionInterval);
           document.getElementById('scanLine').classList.remove('active');
 
-          // Show employee reveal card
           const avatarURL = bestMatch.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(bestMatch.name)}&size=200`;
           document.getElementById('empRevealAvatar').src = avatarURL;
           document.getElementById('empRevealName').textContent = bestMatch.name;
           document.getElementById('empRevealId').textContent = '🪪 ' + bestMatch.empId;
           document.getElementById('empRevealCard').classList.add('show');
-
           setFaceStatus('✓ Face verified! Logging in...', 'success');
 
-          // Fetch full profile
           const profileResult = await apiCall({ action: 'getEmployeeProfile', empId: bestMatch.empId });
-
           if (profileResult.success) {
             const emp = profileResult.employee;
             if (emp.status !== 'Active') {
-              ring.className = 'scan-ring error';
-              setFaceStatus('Account inactive hai. Admin se contact karein.', 'error');
-              document.getElementById('empRevealCard').classList.remove('show');
-              captureInProgress = false;
-              return;
+              ring.className = 'scan-ring error'; setFaceStatus('Account inactive hai.', 'error');
+              document.getElementById('empRevealCard').classList.remove('show'); captureInProgress = false; return;
             }
             currentEmployee = emp;
             sessionStorage.setItem('punchbook_employee', JSON.stringify(currentEmployee));
-            setTimeout(() => {
-              stopCamera();
-              showApp();
-              showToast('Welcome back, ' + currentEmployee.name + '! 👋', 'success');
-            }, 1400);
+            setTimeout(() => { stopCamera(); showApp(); showToast('Welcome back, ' + currentEmployee.name + '! 👋', 'success'); }, 1400);
           }
-
         } else {
-          // ❌ NO MATCH
           ring.className = 'scan-ring error';
-          const pct = bestDistance ? (bestDistance * 100).toFixed(0) : '??';
           setFaceStatus(`Face kisi se match nahi hua. Dobara try karein.`, 'error');
           resetCaptureState(2200);
         }
-
       } catch (err) {
-        console.error('Face verify error:', err);
-        ring.className = 'scan-ring error';
-        setFaceStatus('Error: ' + err.message, 'error');
-        resetCaptureState(2000);
+        ring.className = 'scan-ring error'; setFaceStatus('Error: ' + err.message, 'error'); resetCaptureState(2000);
       }
     }
 
     function resetCaptureState(delay) {
       setTimeout(() => {
-        captureInProgress = false;
-        document.getElementById('captureBtn').disabled = false;
-        document.getElementById('scanRing').className = 'scan-ring';
-        document.getElementById('scanRing').style.borderColor = 'rgba(59,130,246,0.6)';
+        captureInProgress = false; document.getElementById('captureBtn').disabled = false;
+        document.getElementById('scanRing').className = 'scan-ring'; document.getElementById('scanRing').style.borderColor = 'rgba(59,130,246,0.6)';
         setFaceStatus('Camera ko seedha face ke saamne rakhein...', '');
-        // Restart detection if stopped
         if (!faceDetectionInterval || faceDetectionInterval._destroyed) startLiveDetection();
       }, delay);
     }
 
-    // Load stored photo → extract face descriptor
     async function getDescriptorFromURL(url) {
       return new Promise(async (resolve) => {
         try {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = async () => {
-            try {
-              const detection = await faceapi
-                .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 }))
-                .withFaceLandmarks(true)
-                .withFaceDescriptor();
-              resolve(detection ? detection.descriptor : null);
-            } catch (e) { resolve(null); }
-          };
+          const img = new Image(); img.crossOrigin = 'anonymous';
+          img.onload = async () => { try { const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 })).withFaceLandmarks(true).withFaceDescriptor(); resolve(detection ? detection.descriptor : null); } catch (e) { resolve(null); } };
           img.onerror = () => resolve(null);
-          // Handle Google Drive URLs
-          let loadUrl = url;
-          if (url.includes('drive.google.com')) {
-            const match = url.match(/[-\w]{25,}/);
-            if (match) loadUrl = `https://drive.google.com/uc?export=view&id=${match[0]}`;
-          }
-          img.src = loadUrl;
-          setTimeout(() => resolve(null), 10000);
+          let loadUrl = url; if (url.includes('drive.google.com')) { const match = url.match(/[-\w]{25,}/); if (match) loadUrl = `https://drive.google.com/uc?export=view&id=${match[0]}`; }
+          img.src = loadUrl; setTimeout(() => resolve(null), 10000);
         } catch (e) { resolve(null); }
       });
     }
 
     function setFaceStatus(msg, type) {
       const el = document.getElementById('faceStatusMsg');
-      el.textContent = msg;
-      el.className = 'face-status-msg ' + (type || '');
+      el.textContent = msg; el.className = 'face-status-msg ' + (type || '');
     }
 
     function stopCamera() {
       if (faceDetectionInterval) clearInterval(faceDetectionInterval);
       faceDetectionInterval = null;
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(t => t.stop());
-        cameraStream = null;
-      }
+      if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
     }
 
     function cancelFaceAuth() {
-      stopCamera();
-      captureInProgress = false;
-      faceDetected = false;
-      document.getElementById('faceStep1').style.display = 'block';
-      document.getElementById('faceStep2').style.display = 'none';
+      stopCamera(); captureInProgress = false; faceDetected = false;
+      document.getElementById('faceStep1').style.display = 'block'; document.getElementById('faceStep2').style.display = 'none';
       document.getElementById('empRevealCard').classList.remove('show');
-      const startBtn = document.getElementById('startFaceBtn');
-      startBtn.disabled = false;
-      startBtn.innerHTML = '<i class="fas fa-camera"></i> Start Face Scan';
-      const video = document.getElementById('faceVideo');
-      video.srcObject = null;
-      video.style.display = 'none';
-      document.getElementById('faceOverlay').style.display = 'none';
-      document.getElementById('cameraPlaceholder').style.display = 'flex';
-      document.getElementById('scanLine').classList.remove('active');
-      document.getElementById('scanRing').className = 'scan-ring';
-      document.getElementById('scanRing').style.borderColor = '';
-      document.getElementById('captureBtn').disabled = true;
-      setFaceStatus('Camera ko face ke saamne rakhein...', '');
+      const startBtn = document.getElementById('startFaceBtn'); startBtn.disabled = false; startBtn.innerHTML = '<i class="fas fa-camera"></i> Start Face Scan';
+      const video = document.getElementById('faceVideo'); video.srcObject = null; video.style.display = 'none';
+      document.getElementById('faceOverlay').style.display = 'none'; document.getElementById('cameraPlaceholder').style.display = 'flex';
+      document.getElementById('scanLine').classList.remove('active'); document.getElementById('scanRing').className = 'scan-ring'; document.getElementById('scanRing').style.borderColor = '';
+      document.getElementById('captureBtn').disabled = true; setFaceStatus('Camera ko face ke saamne rakhein...', '');
     }
 
-    // ============================================================
-    // PASSWORD LOGIN (fallback)
-    // ============================================================
     async function handleLogin(e) {
       e.preventDefault();
       const empId = document.getElementById('loginEmpId').value.trim();
       const password = document.getElementById('loginPassword').value;
       showToast('Logging in...', '');
       const result = await apiCall({ action: 'employeeLogin', empId, password });
-      if (result.success) {
-        currentEmployee = result.employee;
-        sessionStorage.setItem('punchbook_employee', JSON.stringify(currentEmployee));
-        showApp();
-        showToast('Welcome back, ' + currentEmployee.name + '!', 'success');
-      } else {
-        showToast(result.message, 'error');
-      }
+      if (result.success) { currentEmployee = result.employee; sessionStorage.setItem('punchbook_employee', JSON.stringify(currentEmployee)); showApp(); showToast('Welcome back, ' + currentEmployee.name + '!', 'success'); } 
+      else { showToast(result.message, 'error'); }
     }
 
-    // ============ LOGOUT ============
     function logout() {
       stopCamera();
-      sessionStorage.removeItem('punchbook_employee');
-      currentEmployee = null;
-      document.getElementById('loginPage').style.display = 'flex';
-      document.getElementById('appContainer').style.display = 'none';
-      // Reset face login UI
-      cancelFaceAuth();
-      switchLoginMode('face');
+      stopSettingsCamera(); // <-- Logout hone par bhi camera band
+      sessionStorage.removeItem('punchbook_employee'); currentEmployee = null;
+      document.getElementById('loginPage').style.display = 'flex'; document.getElementById('appContainer').style.display = 'none';
+      cancelFaceAuth(); switchLoginMode('face');
     }
 
-    // ============ SHOW APP ============
     function showApp() {
-      document.getElementById('loginPage').style.display = 'none';
-      document.getElementById('appContainer').style.display = 'block';
+      document.getElementById('loginPage').style.display = 'none'; document.getElementById('appContainer').style.display = 'block';
       document.getElementById('headerName').textContent = currentEmployee.name;
-      loadTodayStatus();
-      loadProfile();
-      loadMonthSelector();
-      loadRecentActivity();
+      loadTodayStatus(); loadProfile(); loadMonthSelector(); loadRecentActivity();
     }
 
-    // ============ TABS ============
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.getElementById(tab + 'Tab').classList.add('active');
-      if (tab === 'attendance') loadAttendance();
-    }
-
-    // ============ TODAY STATUS ============
     async function loadTodayStatus() {
-      document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN', {
-        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
-      });
+      document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
       const result = await apiCall({ action: 'getTodayStatus', empId: currentEmployee.empId });
       if (result.success) {
-        document.getElementById('todayPunchIn').textContent = result.punchIn || '--:--';
-        document.getElementById('todayPunchOut').textContent = result.punchOut || '--:--';
-        document.getElementById('todayHours').textContent = result.workHours ? result.workHours + ' hrs' : '--';
-        const badge = document.getElementById('todayBadge');
-        badge.textContent = result.status;
-        badge.className = 'today-badge';
-        if (result.status === 'Present') badge.classList.add('success');
-        else if (result.status === 'Late') badge.classList.add('warning');
+        document.getElementById('todayPunchIn').textContent = result.punchIn || '--:--'; document.getElementById('todayPunchOut').textContent = result.punchOut || '--:--'; document.getElementById('todayHours').textContent = result.workHours ? result.workHours + ' hrs' : '--';
+        const badge = document.getElementById('todayBadge'); badge.textContent = result.status; badge.className = 'today-badge';
+        if (result.status === 'Present') badge.classList.add('success'); else if (result.status === 'Late') badge.classList.add('warning');
       }
-      const now = new Date();
-      const summaryResult = await apiCall({ action: 'getAttendanceSummary', empId: currentEmployee.empId, month: now.getMonth() + 1, year: now.getFullYear() });
+      const now = new Date(); const summaryResult = await apiCall({ action: 'getAttendanceSummary', empId: currentEmployee.empId, month: now.getMonth() + 1, year: now.getFullYear() });
       if (summaryResult.success) {
-        document.getElementById('quickPresent').textContent = summaryResult.summary.presentDays;
-        document.getElementById('quickAbsent').textContent = summaryResult.summary.absentDays;
-        document.getElementById('quickLate').textContent = summaryResult.summary.lateDays;
-        document.getElementById('quickPercent').textContent = summaryResult.summary.attendancePercent + '%';
-        document.getElementById('quickWeekOff').textContent = summaryResult.summary.weekOffs || '0';
-        document.getElementById('quickHoliday').textContent = summaryResult.summary.holidays || '0';
+        document.getElementById('quickPresent').textContent = summaryResult.summary.presentDays; document.getElementById('quickAbsent').textContent = summaryResult.summary.absentDays;
+        document.getElementById('quickLate').textContent = summaryResult.summary.lateDays; document.getElementById('quickPercent').textContent = summaryResult.summary.attendancePercent + '%';
+        document.getElementById('quickWeekOff').textContent = summaryResult.summary.weekOffs || '0'; document.getElementById('quickHoliday').textContent = summaryResult.summary.holidays || '0';
       }
     }
 
-    // ============ PROFILE ============
     async function loadProfile() {
       const result = await apiCall({ action: 'getEmployeeProfile', empId: currentEmployee.empId });
       if (result.success) {
         const emp = result.employee;
         const photoURL = result.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(emp.name) + '&size=200';
-        document.getElementById('headerAvatar').src = photoURL;
-        document.getElementById('profileAvatar').src = photoURL;
-        document.getElementById('profileName').textContent = emp.name;
-        document.getElementById('profileEmpId').textContent = emp.empId;
-        document.getElementById('profileDept').textContent = emp.department;
-        document.getElementById('profileEmail').textContent = emp.email;
-        document.getElementById('profilePhone').textContent = emp.phone || 'Not set';
-        document.getElementById('profileDesignation').textContent = emp.designation;
-        document.getElementById('profileJoinDate').textContent = formatDate(emp.joinDate);
-        document.getElementById('profileWeekOff').textContent = emp.weekOff || 'Sunday';
+        document.getElementById('headerAvatar').src = photoURL; document.getElementById('profileAvatar').src = photoURL;
+        document.getElementById('profileName').textContent = emp.name; document.getElementById('profileEmpId').textContent = emp.empId;
+        document.getElementById('profileDept').textContent = emp.department; document.getElementById('profileEmail').textContent = emp.email;
+        document.getElementById('profilePhone').textContent = emp.phone || 'Not set'; document.getElementById('profileDesignation').textContent = emp.designation;
+        document.getElementById('profileJoinDate').textContent = formatDate(emp.joinDate); document.getElementById('profileWeekOff').textContent = emp.weekOff || 'Sunday';
         document.getElementById('profileStatus').textContent = emp.status;
       }
     }
 
-    // ============ ATTENDANCE ============
     async function loadMonthSelector() {
       const result = await apiCall({ action: 'getAvailableMonths' });
-      if (result.success) {
-        const select = document.getElementById('monthSelector');
-        select.innerHTML = result.months.map(m => `<option value="${m.value}">${m.label}</option>`).join('');
-        loadAttendance();
-      }
+      if (result.success) { const select = document.getElementById('monthSelector'); select.innerHTML = result.months.map(m => `<option value="${m.value}">${m.label}</option>`).join(''); loadAttendance(); }
     }
 
     async function loadAttendance() {
-      const monthValue = document.getElementById('monthSelector').value;
-      if (!monthValue) return;
-      const [month, year] = monthValue.split('-');
-      document.getElementById('attendanceTable').innerHTML = '<tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>';
+      const monthValue = document.getElementById('monthSelector').value; if (!monthValue) return;
+      const [month, year] = monthValue.split('-'); document.getElementById('attendanceTable').innerHTML = '<tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>';
       const result = await apiCall({ action: 'getAttendanceSummary', empId: currentEmployee.empId, month: parseInt(month), year: parseInt(year) });
       if (result.success) {
-        document.getElementById('monthPresent').textContent = result.summary.presentDays;
-        document.getElementById('monthAbsent').textContent = result.summary.absentDays;
-        document.getElementById('monthLate').textContent = result.summary.lateDays;
-        document.getElementById('monthHours').textContent = result.summary.totalHours;
-        document.getElementById('monthWeekOff').textContent = result.summary.weekOffs || '0';
-        document.getElementById('monthHoliday').textContent = result.summary.holidays || '0';
+        document.getElementById('monthPresent').textContent = result.summary.presentDays; document.getElementById('monthAbsent').textContent = result.summary.absentDays; document.getElementById('monthLate').textContent = result.summary.lateDays;
+        document.getElementById('monthHours').textContent = result.summary.totalHours; document.getElementById('monthWeekOff').textContent = result.summary.weekOffs || '0'; document.getElementById('monthHoliday').textContent = result.summary.holidays || '0';
         renderAttendanceTable(result.records, 'attendanceTable');
       }
     }
@@ -1204,46 +1044,21 @@
 
     function renderAttendanceTable(records, tableId) {
       const tbody = document.getElementById(tableId);
-      if (records.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-calendar-times"></i><p>No records found</p></td></tr>';
-        return;
-      }
-      tbody.innerHTML = records.map(r => `
-        <tr>
-          <td>${formatDate(r.date)}</td>
-          <td>${r.punchIn || '-'}</td>
-          <td>${r.punchOut || '-'}</td>
-          <td>${r.workHours ? r.workHours + ' hrs' : '-'}</td>
-          <td><span class="badge badge-${r.status === 'Present' ? 'success' : r.status === 'Late' ? 'warning' : 'danger'}">${r.status}</span></td>
-        </tr>
-      `).join('');
+      if (records.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-calendar-times"></i><p>No records found</p></td></tr>'; return; }
+      tbody.innerHTML = records.map(r => `<tr><td>${formatDate(r.date)}</td><td>${r.punchIn || '-'}</td><td>${r.punchOut || '-'}</td><td>${r.workHours ? r.workHours + ' hrs' : '-'}</td><td><span class="badge badge-${r.status === 'Present' ? 'success' : r.status === 'Late' ? 'warning' : 'danger'}">${r.status}</span></td></tr>`).join('');
     }
 
-    // ============ SETTINGS ============
     async function handlePasswordChange(e) {
       e.preventDefault();
-      const currentPassword = document.getElementById('currentPassword').value;
-      const newPassword = document.getElementById('newPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
+      const currentPassword = document.getElementById('currentPassword').value; const newPassword = document.getElementById('newPassword').value; const confirmPassword = document.getElementById('confirmPassword').value;
       if (newPassword !== confirmPassword) { showToast('New passwords do not match', 'error'); return; }
       if (newPassword.length < 6) { showToast('Password must be at least 6 characters', 'error'); return; }
       const result = await apiCall({ action: 'changePassword', empId: currentEmployee.empId, currentPassword, newPassword });
-      if (result.success) { showToast(result.message, 'success'); document.getElementById('passwordForm').reset(); }
-      else showToast(result.message, 'error');
+      if (result.success) { showToast(result.message, 'success'); document.getElementById('passwordForm').reset(); } else showToast(result.message, 'error');
     }
 
-    // ============ HELPERS ============
-    function showToast(message, type) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = 'toast show ' + type;
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    function formatDate(dateStr) {
-      if (!dateStr) return '-';
-      return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-    }
+    function showToast(message, type) { const toast = document.getElementById('toast'); toast.textContent = message; toast.className = 'toast show ' + type; setTimeout(() => toast.classList.remove('show'), 3000); }
+    function formatDate(dateStr) { if (!dateStr) return '-'; return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
   </script>
 </body>
-</html> 
+</html>
