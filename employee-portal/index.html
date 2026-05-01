@@ -37,162 +37,54 @@
     }
     
     /* ================= LOGIN PAGE ================= */
-    .login-container {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #1e3a8a 0%, #3B82F6 100%);
-      padding: 20px;
-    }
-    
-    .login-box {
-      background: white;
-      padding: 80px 40px 40px; 
-      margin-top: 60px; 
-      border-radius: 20px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      width: 100%;
-      max-width: 420px;
-      position: relative; 
-    }
-    
-    .logo-container {
-      position: absolute;
-      top: -80px; 
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .logo {
-      width: 240px; 
-      height: auto;
-      display: block;
-      transform: perspective(900px) rotateX(12deg) rotateY(-10deg) scale(1.05);
-      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.35));
-      transition: all 0.4s ease;
-    }
-
-    .logo:hover {
-      transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.1);
-    }
-
+    .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e3a8a 0%, #3B82F6 100%); padding: 20px; }
+    .login-box { background: white; padding: 80px 40px 40px; margin-top: 60px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 100%; max-width: 420px; position: relative; }
+    .logo-container { position: absolute; top: -80px; left: 50%; transform: translateX(-50%); }
+    .logo { width: 240px; height: auto; display: block; transform: perspective(900px) rotateX(12deg) rotateY(-10deg) scale(1.05); filter: drop-shadow(0 20px 30px rgba(0,0,0,0.35)); transition: all 0.4s ease; }
+    .logo:hover { transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.1); }
     .login-logo { text-align: center; margin-bottom: 28px; }
     .login-logo h1 { color: var(--gray-900); font-size: 24px; margin-top: 12px; }
     .login-logo p { color: var(--gray-500); font-size: 14px; }
     
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; margin-bottom: 6px; color: var(--gray-700); font-weight: 500; font-size: 14px; }
-    .form-group input, .form-group select {
-      width: 100%; padding: 12px 16px; border: 1px solid var(--gray-300); border-radius: 10px; font-size: 14px; transition: all 0.2s;
-    }
-    .form-group input:focus, .form-group select:focus {
-      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
+    .form-group input, .form-group select { width: 100%; padding: 12px 16px; border: 1px solid var(--gray-300); border-radius: 10px; font-size: 14px; transition: all 0.2s; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
     
-    .btn {
-      padding: 12px 24px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    }
+    .btn { padding: 12px 24px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
     .btn-primary { background: var(--primary); color: white; width: 100%; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-primary:disabled { background: var(--gray-300); cursor: not-allowed; }
     .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
+    .btn-success { background: var(--success); color: white; }
     .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); width: 100%; }
     .btn-outline:hover { background: var(--gray-50); }
     
     /* ================= LOGIN TABS ================= */
-    .login-tabs {
-      display: flex;
-      background: var(--gray-100);
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 24px;
-    }
-    .login-tab-btn {
-      flex: 1; padding: 9px; border: none; background: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--gray-500); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
+    .login-tabs { display: flex; background: var(--gray-100); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+    .login-tab-btn { flex: 1; padding: 9px; border: none; background: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--gray-500); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .login-tab-btn.active { background: white; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
 
     /* ================= FACE AUTH UI ================= */
     #faceLoginSection { display: none; }
     #passwordLoginSection { display: block; }
 
-    .emp-reveal-card {
-      display: none;
-      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-      border: 2px solid #86efac;
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-      animation: revealPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
+    .emp-reveal-card { display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #86efac; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; animation: revealPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
     .emp-reveal-card.show { display: flex; align-items: center; gap: 14px; }
-    @keyframes revealPop {
-      from { opacity: 0; transform: scale(0.85) translateY(8px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
-    }
-    .emp-reveal-avatar {
-      width: 52px; height: 52px; border-radius: 50%;
-      object-fit: cover; border: 2px solid #22c55e;
-      flex-shrink: 0;
-    }
+    @keyframes revealPop { from { opacity: 0; transform: scale(0.85) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .emp-reveal-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid #22c55e; flex-shrink: 0; }
     .emp-reveal-info { flex: 1; }
-    .emp-reveal-name {
-      font-size: 16px; font-weight: 700; color: #15803d; line-height: 1.2;
-    }
-    .emp-reveal-id {
-      font-size: 13px; color: #16a34a; margin-top: 2px; font-weight: 500;
-    }
-    .emp-reveal-check {
-      font-size: 22px; color: #22c55e; flex-shrink: 0;
-    }
+    .emp-reveal-name { font-size: 16px; font-weight: 700; color: #15803d; line-height: 1.2; }
+    .emp-reveal-id { font-size: 13px; color: #16a34a; margin-top: 2px; font-weight: 500; }
+    .emp-reveal-check { font-size: 22px; color: #22c55e; flex-shrink: 0; }
 
-    .face-scan-area {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4/3;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #0f172a;
-      margin-bottom: 16px;
-      border: 2px solid var(--gray-200);
-    }
-    .face-scan-area video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scaleX(-1);
-    }
-    .face-scan-area canvas.overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      transform: scaleX(-1);
-    }
+    .face-scan-area { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 16px; overflow: hidden; background: #0f172a; margin-bottom: 16px; border: 2px solid var(--gray-200); }
+    .face-scan-area video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+    .face-scan-area canvas.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: scaleX(-1); }
 
-    .scan-ring {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 180px; height: 180px;
-      border-radius: 50%;
-      border: 3px solid rgba(59,130,246,0.6);
-      pointer-events: none;
-      z-index: 5;
-      animation: scanPulse 2s ease-in-out infinite;
-    }
-    .scan-ring::before {
-      content: '';
-      position: absolute;
-      top: -8px; left: -8px; right: -8px; bottom: -8px;
-      border-radius: 50%;
-      border: 1px solid rgba(59,130,246,0.25);
-    }
-    @keyframes scanPulse {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
-      50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
-    }
+    .scan-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; border-radius: 50%; border: 3px solid rgba(59,130,246,0.6); pointer-events: none; z-index: 5; animation: scanPulse 2s ease-in-out infinite; }
+    .scan-ring::before { content: ''; position: absolute; top: -8px; left: -8px; right: -8px; bottom: -8px; border-radius: 50%; border: 1px solid rgba(59,130,246,0.25); }
+    @keyframes scanPulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; } 50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; } }
 
     .scan-ring.scanning { border-color: var(--warning); animation: scanRotate 1s linear infinite; }
     @keyframes scanRotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
@@ -297,33 +189,22 @@
     .profile-detail .label { color: var(--gray-500); font-size: 12px; margin-bottom: 4px; }
     .profile-detail .value { color: var(--gray-900); font-weight: 600; font-size: 14px; }
     
-    /* ================= SETTINGS GRID (NEW) ================= */
-    .settings-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      align-items: start;
-    }
-    .settings-card {
-      background: white; 
-      border-radius: 16px; 
-      padding: 24px; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
+    /* ================= SETTINGS GRID ================= */
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+    .settings-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .settings-card h3 { font-size: 16px; color: var(--gray-900); margin-bottom: 8px; }
     .settings-card p.desc { font-size: 13px; color: var(--gray-500); margin-bottom: 16px; line-height: 1.4; }
     
-    .update-face-area {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4/3;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #0f172a;
-      margin-bottom: 16px;
-      border: 2px solid var(--gray-200);
-    }
-    .update-face-area video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+    /* Settings Camera UI */
+    .face-capture-container { text-align: center; }
+    .video-container { position: relative; width: 100%; max-width: 400px; margin: 0 auto; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 4/3; }
+    .video-container video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+    .video-container canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: scaleX(-1); }
+    .face-status { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 500; background: var(--gray-100); color: var(--gray-700); }
+    .face-status.detecting { background: #FEF3C7; color: #D97706; }
+    .face-status.detected { background: #D1FAE5; color: #059669; }
+    .face-status.error { background: #FEE2E2; color: #DC2626; }
+    .captured-photo { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary); margin: 20px auto; display: block; }
     
     /* ================= TOAST ================= */
     .toast { position: fixed; bottom: 24px; right: 24px; padding: 16px 24px; background: var(--gray-900); color: white; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 2000; display: none; }
@@ -335,7 +216,6 @@
     .loading { display: flex; align-items: center; justify-content: center; padding: 40px; }
     .spinner { width: 30px; height: 30px; border: 3px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    
     .empty-state { text-align: center; padding: 40px; color: var(--gray-500); }
     .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
     
@@ -351,7 +231,7 @@
       .stats-header { flex-direction: column; gap: 12px; align-items: flex-start; }
       .month-selector { width: 100%; } 
       .login-box { padding: 60px 20px 30px; margin-top: 40px; }
-      .settings-grid { grid-template-columns: 1fr; } /* Stack on mobile */
+      .settings-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 480px) {
       .header-logo h1 { display: none; }
@@ -361,7 +241,7 @@
 </head>
 <body>
 
-  <!-- ================= LOGIN PAGE (No changes) ================= -->
+  <!-- ================= LOGIN PAGE ================= -->
   <div class="login-container" id="loginPage">
     <div class="login-box">
       <div class="logo-container"><img src="punchbook_logo.png" alt="Punch Book" class="logo"></div>
@@ -372,7 +252,6 @@
         <button class="login-tab-btn" onclick="switchLoginMode('password')" id="passTabBtn"><i class="fas fa-key"></i> Password</button>
       </div>
 
-      <!-- FACE LOGIN -->
       <div id="faceLoginSection">
         <div id="faceStep1">
           <div style="text-align:center; padding: 8px 0 16px;">
@@ -411,13 +290,12 @@
           <div class="face-status-msg" id="faceStatusMsg">Camera ko seedha face ke saamne rakhein...</div>
 
           <div style="display:flex; gap:10px; margin-bottom:12px;">
-            <button class="btn btn-primary" onclick="captureFace()" id="captureBtn" style="flex:1;" disabled><i class="fas fa-fingerprint"></i> Verify Now</button>
+            <button class="btn btn-primary" onclick="captureFaceLogin()" id="captureBtn" style="flex:1;" disabled><i class="fas fa-fingerprint"></i> Verify Now</button>
             <button class="btn btn-secondary" onclick="cancelFaceAuth()" style="padding: 12px 18px;"><i class="fas fa-times"></i></button>
           </div>
         </div>
       </div>
 
-      <!-- PASSWORD LOGIN -->
       <div id="passwordLoginSection" style="display:none;">
         <form id="loginForm">
           <div class="form-group"><label>Employee ID</label><input type="text" id="loginEmpId" placeholder="MC1234" required></div>
@@ -430,7 +308,6 @@
 
   <!-- ================= MAIN APP ================= -->
   <div class="app-container" id="appContainer">
-    
     <header class="app-header">
       <div class="header-content">
         <div class="header-logo"><img src="punchbook_logo.png" alt="Punch Book"><h1>Punch Book</h1></div>
@@ -450,7 +327,6 @@
         <button class="tab-btn" data-tab="settings"><i class="fas fa-cog"></i> Settings</button>
       </div>
 
-      <!-- DASHBOARD TAB -->
       <div class="tab-content active" id="dashboardTab">
         <div class="today-status">
           <h3><i class="fas fa-clock"></i> Today's Status - <span id="todayDate"></span></h3>
@@ -486,7 +362,6 @@
         </div>
       </div>
 
-      <!-- ATTENDANCE TAB -->
       <div class="tab-content" id="attendanceTab">
         <div class="stats-section">
           <div class="stats-header">
@@ -514,7 +389,6 @@
         </div>
       </div>
 
-      <!-- PROFILE TAB -->
       <div class="tab-content" id="profileTab">
         <div class="profile-section">
           <div class="profile-header">
@@ -536,33 +410,50 @@
         </div>
       </div>
 
-      <!-- SETTINGS TAB (UPDATED TO GRID) -->
+      <!-- SETTINGS TAB (UPDATED FOR ADMIN STYLE FACE CAPTURE) -->
       <div class="tab-content" id="settingsTab">
         <div class="settings-grid">
           
-          <!-- LEFT: Update Face Data -->
+          <!-- LEFT: Face Authentication Capture -->
           <div class="settings-card">
-            <h3><i class="fas fa-camera-rotate"></i> Update Face Data</h3>
-            <p class="desc">Naya face data capture karein. Ye FaceData sheet mein automatically update ho jayega.</p>
+            <h3><i class="fas fa-camera"></i> Register / Update Face</h3>
+            <p class="desc">Live camera se apna face scan karein. Yeh data Face Authentication login ke liye use hoga.</p>
             
-            <div class="update-face-area" id="settingsFaceArea">
-              <div class="camera-placeholder" id="settingsCameraPlaceholder">
-                <i class="fas fa-camera-slash"></i>
-                <span>Camera Off</span>
+            <div class="face-capture-container">
+              
+              <!-- Video Placeholder -->
+              <div class="video-container" id="settingsVideoContainer" style="display:none;">
+                <video id="settingsFaceVideo" autoplay muted playsinline></video>
+                <canvas id="settingsFaceCanvas"></canvas>
               </div>
-              <video id="settingsFaceVideo" autoplay muted playsinline style="display:none;"></video>
-            </div>
 
-            <div style="display:flex; gap:10px;">
-              <button class="btn btn-outline" onclick="startSettingsCamera()" id="btnStartSettingsCam">
-                <i class="fas fa-video"></i> Start Camera
-              </button>
-              <button class="btn btn-primary" onclick="captureAndUploadFace()" id="btnCaptureSettingsCam" style="display:none; flex:1;">
-                <i class="fas fa-cloud-upload-alt"></i> Update Face
-              </button>
-              <button class="btn btn-secondary" onclick="stopSettingsCamera()" id="btnStopSettingsCam" style="display:none; padding: 12px 18px;">
-                <i class="fas fa-times"></i>
-              </button>
+              <!-- Camera Off Placeholder -->
+              <div class="face-scan-area" id="settingsCameraPlaceholder" style="background:#0f172a; margin-bottom:0;">
+                <div class="camera-placeholder"><i class="fas fa-camera-slash"></i><span>Camera is Off</span></div>
+              </div>
+
+              <!-- Status Box -->
+              <div class="face-status" id="settingsFaceStatus">Ready to scan. Click "Start Camera".</div>
+
+              <!-- Captured Photo Preview -->
+              <img id="settingsCapturedPhoto" class="captured-photo" style="display:none;">
+
+              <!-- Controls -->
+              <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-outline" id="btnStartSettingsCam" onclick="startSettingsFaceCamera()" style="flex:1;">
+                  <i class="fas fa-video"></i> Start Camera
+                </button>
+                <button class="btn btn-success" id="btnCaptureSettingsCam" onclick="captureSettingsFace()" style="display:none; flex:1;" disabled>
+                  <i class="fas fa-camera"></i> Capture Face
+                </button>
+                <button class="btn btn-primary" id="btnSaveSettingsFace" onclick="saveSettingsFaceData()" style="display:none; flex:1;">
+                  <i class="fas fa-save"></i> Save Face Data
+                </button>
+                <button class="btn btn-secondary" id="btnCancelSettingsCam" onclick="stopSettingsFaceCamera()" style="display:none; padding: 12px 18px;">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
             </div>
           </div>
 
@@ -586,26 +477,37 @@
   <div class="toast" id="toast"></div>
 
   <script>
+    // ============================================================
+    // ⚠️ SIRF YEH LINE BADLO - APNI APPS SCRIPT URL YAHAN DAALO
+    // ============================================================
     const API_URL = 'https://script.google.com/macros/s/AKfycbxPxRUqdubBd2xkGH1vSMq7tDzN1Zg_ABdY88etLy0f1KMKwCmas7to_XbI7WrpwHsk/exec'; 
+    // ============================================================
+    
     const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model';
 
     let currentEmployee = null;
-    let cameraStream = null;
-    let settingsStream = null; // New stream specifically for Settings Tab
+    
+    // Login Camera Vars
+    let loginStream = null;
     let faceApiLoaded = false;
-    let faceDetectionInterval = null;
-    let faceDetected = false;
-    let captureInProgress = false;
+    let loginDetectionInterval = null;
+    let loginFaceDetected = false;
+    let loginCaptureInProgress = false;
 
+    // Face Auth Data
     let allFaceDescriptors = [];
     let faceDataLoaded = false;
+    
+    // Settings Camera Vars
+    let settingsFaceDescriptor = null;
+    let settingsPhotoBase64 = null;
+    let settingsStream = null;
+    let settingsDetectionInterval = null;
 
-    // ============ API HELPER ============
     async function apiCall(params) {
       try {
         let response;
-        // Sending POST request for updating face or changing password
-        if (params.action === 'changePassword' || params.action === 'updateEmployeeFace') {
+        if (params.action === 'changePassword' || params.action === 'saveFaceData') {
           response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -622,7 +524,6 @@
       }
     }
 
-    // ============ INIT ============
     document.addEventListener('DOMContentLoaded', function() {
       const saved = sessionStorage.getItem('punchbook_employee');
       if (saved) {
@@ -637,10 +538,9 @@
       });
     });
 
-    // ============ TABS ============
     function switchTab(tab) {
-      // Jab user Settings tab se dusre tab me jaye, camera band ho jaye
-      if (tab !== 'settings') { stopSettingsCamera(); }
+      // Jab user Settings tab se bahar jaye toh camera automatically band ho jaye
+      if (tab !== 'settings') { stopSettingsFaceCamera(); }
 
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
@@ -649,91 +549,172 @@
       if (tab === 'attendance') loadAttendance();
     }
 
-    // ============ SETTINGS FACE UPDATE FUNCTIONS ============
-    async function startSettingsCamera() {
+    // ==============================================================
+    // NEW: SETTINGS LIVE FACE CAPTURE (Matches Admin Panel)
+    // ==============================================================
+    async function startSettingsFaceCamera() {
+      const btn = document.getElementById('btnStartSettingsCam');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;border-top-color:var(--primary);"></div> Loading...';
+      
+      const statusEl = document.getElementById('settingsFaceStatus');
+      statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading AI Models...';
+      statusEl.className = 'face-status detecting';
+
+      settingsFaceDescriptor = null;
+      settingsPhotoBase64 = null;
+      document.getElementById('settingsCapturedPhoto').style.display = 'none';
+
       try {
-        settingsStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
-          audio: false
-        });
+        // Load all 3 models required for Face Recognition (just like Admin Panel)
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+        ]);
+
+        settingsStream = await navigator.mediaDevices.getUserMedia({ video: { width: 400, height: 300, facingMode: 'user' }, audio: false });
         const video = document.getElementById('settingsFaceVideo');
         video.srcObject = settingsStream;
-        video.style.display = 'block';
+        
+        document.getElementById('settingsVideoContainer').style.display = 'block';
         document.getElementById('settingsCameraPlaceholder').style.display = 'none';
-
-        document.getElementById('btnStartSettingsCam').style.display = 'none';
+        
+        btn.style.display = 'none';
         document.getElementById('btnCaptureSettingsCam').style.display = 'block';
-        document.getElementById('btnStopSettingsCam').style.display = 'block';
+        document.getElementById('btnCancelSettingsCam').style.display = 'block';
+        document.getElementById('btnSaveSettingsFace').style.display = 'none';
+        
+        video.onloadedmetadata = () => { detectSettingsFace(); };
       } catch (err) {
-        showToast('Camera access denied. Browser settings check karein.', 'error');
+        statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Camera access denied';
+        statusEl.className = 'face-status error';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-video"></i> Start Camera';
       }
     }
 
-    function stopSettingsCamera() {
-      if (settingsStream) {
-        settingsStream.getTracks().forEach(t => t.stop());
-        settingsStream = null;
-      }
+    async function detectSettingsFace() {
       const video = document.getElementById('settingsFaceVideo');
-      video.srcObject = null;
-      video.style.display = 'none';
-      document.getElementById('settingsCameraPlaceholder').style.display = 'flex';
-      
-      document.getElementById('btnStartSettingsCam').style.display = 'block';
-      document.getElementById('btnCaptureSettingsCam').style.display = 'none';
-      document.getElementById('btnStopSettingsCam').style.display = 'none';
-    }
-
-    async function captureAndUploadFace() {
-      const video = document.getElementById('settingsFaceVideo');
-      if (!settingsStream || video.style.display === 'none') return;
-
-      const btn = document.getElementById('btnCaptureSettingsCam');
-      btn.disabled = true;
-      btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;border-top-color:white;"></div> Uploading...';
-
-      // 1. Draw video frame to hidden canvas
-      const canvas = document.createElement('canvas');
+      const canvas = document.getElementById('settingsFaceCanvas');
+      const ctx = canvas.getContext('2d');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const statusEl = document.getElementById('settingsFaceStatus');
+      const captureBtn = document.getElementById('btnCaptureSettingsCam');
 
-      // 2. Convert to Base64
-      const base64Data = canvas.toDataURL('image/jpeg', 0.85);
+      settingsDetectionInterval = setInterval(async () => {
+        const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (detections) {
+          const box = detections.detection.box;
+          ctx.strokeStyle = '#10B981'; ctx.lineWidth = 3;
+          ctx.strokeRect(box.x, box.y, box.width, box.height);
+          statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Face detected! Click Capture';
+          statusEl.className = 'face-status detected';
+          captureBtn.disabled = false;
+        } else {
+          statusEl.innerHTML = '<i class="fas fa-search"></i> Looking for face...';
+          statusEl.className = 'face-status detecting';
+          captureBtn.disabled = true;
+        }
+      }, 200);
+    }
+
+    async function captureSettingsFace() {
+      const video = document.getElementById('settingsFaceVideo');
+      const statusEl = document.getElementById('settingsFaceStatus');
+      
+      const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+      
+      if (detection) {
+        // Extract 128-d descriptor array
+        settingsFaceDescriptor = Array.from(detection.descriptor);
+        
+        // Capture Photo base64
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = video.videoWidth;
+        tempCanvas.height = video.videoHeight;
+        tempCanvas.getContext('2d').drawImage(video, 0, 0);
+        settingsPhotoBase64 = tempCanvas.toDataURL('image/jpeg', 0.85);
+        
+        // Update UI
+        document.getElementById('settingsCapturedPhoto').src = settingsPhotoBase64;
+        document.getElementById('settingsCapturedPhoto').style.display = 'block';
+        document.getElementById('settingsVideoContainer').style.display = 'none';
+        
+        document.getElementById('btnCaptureSettingsCam').style.display = 'none';
+        document.getElementById('btnSaveSettingsFace').style.display = 'block';
+        document.getElementById('btnSaveSettingsFace').disabled = false;
+        
+        if (settingsDetectionInterval) clearInterval(settingsDetectionInterval);
+        statusEl.innerHTML = '<i class="fas fa-check"></i> Face captured! Now click Save.';
+        statusEl.className = 'face-status detected';
+      } else {
+        showToast('No face detected. Try again.', 'error');
+      }
+    }
+
+    async function saveSettingsFaceData() {
+      if (!settingsFaceDescriptor || !settingsPhotoBase64) return;
+      
+      const btn = document.getElementById('btnSaveSettingsFace');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;border-top-color:white;"></div> Saving...';
 
       try {
-        // 3. Send to Google Apps Script
-        const result = await apiCall({ 
-          action: 'updateEmployeeFace', 
-          empId: currentEmployee.empId, 
-          imageBase64: base64Data 
+        const result = await apiCall({
+          action: 'saveFaceData',
+          empId: currentEmployee.empId,
+          empName: currentEmployee.name,
+          faceDescriptor: JSON.stringify(settingsFaceDescriptor), // Direct array to string
+          photoBase64: settingsPhotoBase64
         });
 
         if (result.success) {
-          showToast('Face data successfully updated!', 'success');
-          stopSettingsCamera();
-          faceDataLoaded = false; // Agli baar login par naya face load hoga
+          showToast('Face Registration Successful!', 'success');
+          stopSettingsFaceCamera();
+          faceDataLoaded = false; // Force reload next time login happens
           
-          // Agar nayi photo ki URL aayi ho toh profile pic update kar de
-          if (result.photoURL) {
-            document.getElementById('headerAvatar').src = result.photoURL;
-            document.getElementById('profileAvatar').src = result.photoURL;
-          }
+          // Update profile avatars visually
+          document.getElementById('headerAvatar').src = settingsPhotoBase64;
+          document.getElementById('profileAvatar').src = settingsPhotoBase64;
         } else {
           showToast('Failed: ' + result.message, 'error');
         }
       } catch (error) {
-        showToast('Upload error. Internet check karein.', 'error');
+        showToast('Network error while saving.', 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Update Face';
+        btn.innerHTML = '<i class="fas fa-save"></i> Save Face Data';
       }
+    }
+
+    function stopSettingsFaceCamera() {
+      if (settingsDetectionInterval) { clearInterval(settingsDetectionInterval); settingsDetectionInterval = null; }
+      if (settingsStream) { settingsStream.getTracks().forEach(t => t.stop()); settingsStream = null; }
+      
+      document.getElementById('settingsVideoContainer').style.display = 'none';
+      document.getElementById('settingsCameraPlaceholder').style.display = 'flex';
+      
+      const statusEl = document.getElementById('settingsFaceStatus');
+      statusEl.innerHTML = 'Ready to scan. Click "Start Camera".';
+      statusEl.className = 'face-status';
+      
+      const btnStart = document.getElementById('btnStartSettingsCam');
+      btnStart.style.display = 'block';
+      btnStart.disabled = false;
+      btnStart.innerHTML = '<i class="fas fa-video"></i> Start Camera';
+      
+      document.getElementById('btnCaptureSettingsCam').style.display = 'none';
+      document.getElementById('btnSaveSettingsFace').style.display = 'none';
+      document.getElementById('btnCancelSettingsCam').style.display = 'none';
     }
 
 
     /* =========================================================
-       SARA PURANA LOGIC NICHE WAISE HI HAI (No breaking changes)
+       LOGIN AND FACE AUTH LOGIC 
        ========================================================= */
 
     function switchLoginMode(mode) {
@@ -771,7 +752,7 @@
 
       document.getElementById('faceStep1').style.display = 'none';
       document.getElementById('faceStep2').style.display = 'block';
-      await startCamera();
+      await startLoginCamera();
     }
 
     async function loadFaceApiModels() {
@@ -779,7 +760,8 @@
         setModelProgress(20, 'Loading Face Detector...');
         await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
         setModelProgress(55, 'Loading Landmark Model...');
-        await faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL);
+        // We load the main 68Net to match the Admin Panel exactly
+        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL); 
         setModelProgress(80, 'Loading Recognition Model...');
         await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
         faceApiLoaded = true;
@@ -790,14 +772,26 @@
       }
     }
 
+    // UPDATED: Now it uses the direct JSON descriptor from the backend (SUPER FAST!)
     async function loadAllFaceDescriptors() {
       allFaceDescriptors = [];
       try {
         const result = await apiCall({ action: 'getAllFaceData' });
         if (!result.success || !result.faces || result.faces.length === 0) return;
+        
         const promises = result.faces.map(async (face) => {
-          const descriptor = await getDescriptorFromURL(face.photoURL);
-          if (descriptor) allFaceDescriptors.push({ empId: face.empId, name: face.name, photoURL: face.photoURL, descriptor: descriptor });
+          let descriptor = null;
+          // Agar backend se array milla hai (direct database se)
+          if (face.faceDescriptor && face.faceDescriptor.length === 128) {
+            descriptor = new Float32Array(face.faceDescriptor);
+          } else if (face.photoURL) {
+            // Fallback: load photo via URL
+            descriptor = await getDescriptorFromURL(face.photoURL);
+          }
+          
+          if (descriptor) {
+            allFaceDescriptors.push({ empId: face.empId, name: face.name, photoURL: face.photoURL, descriptor: descriptor });
+          }
         });
         await Promise.all(promises);
         faceDataLoaded = allFaceDescriptors.length > 0;
@@ -809,11 +803,11 @@
       document.getElementById('modelLoadingText').textContent = text;
     }
 
-    async function startCamera() {
+    async function startLoginCamera() {
       try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }, audio: false });
+        loginStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }, audio: false });
         const video = document.getElementById('faceVideo');
-        video.srcObject = cameraStream;
+        video.srcObject = loginStream;
         await new Promise(res => { video.onloadedmetadata = res; });
         video.play();
         document.getElementById('cameraPlaceholder').style.display = 'none';
@@ -822,25 +816,25 @@
         overlay.style.display = 'block';
         overlay.width = video.videoWidth;
         overlay.height = video.videoHeight;
-        startLiveDetection();
+        startLoginLiveDetection();
       } catch (err) {
         setFaceStatus('Camera access denied.', 'error');
       }
     }
 
-    function startLiveDetection() {
+    function startLoginLiveDetection() {
       const video = document.getElementById('faceVideo');
       const overlay = document.getElementById('faceOverlay');
       const ctx = overlay.getContext('2d');
       document.getElementById('scanLine').classList.add('active');
 
-      faceDetectionInterval = setInterval(async () => {
-        if (captureInProgress) return;
+      loginDetectionInterval = setInterval(async () => {
+        if (loginCaptureInProgress) return;
         ctx.clearRect(0, 0, overlay.width, overlay.height);
         try {
           const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 }));
           if (detection) {
-            faceDetected = true;
+            loginFaceDetected = true;
             const { x, y, width, height } = detection.box;
             ctx.strokeStyle = '#10B981'; ctx.lineWidth = 2; ctx.strokeRect(x, y, width, height);
             document.getElementById('scanRing').className = 'scan-ring';
@@ -848,7 +842,7 @@
             document.getElementById('captureBtn').disabled = false;
             setFaceStatus('✓ Face detect ho gaya! "Verify Now" dabayein.', 'success');
           } else {
-            faceDetected = false;
+            loginFaceDetected = false;
             document.getElementById('scanRing').className = 'scan-ring';
             document.getElementById('scanRing').style.borderColor = 'rgba(59,130,246,0.6)';
             document.getElementById('captureBtn').disabled = true;
@@ -858,9 +852,9 @@
       }, 400);
     }
 
-    async function captureFace() {
-      if (!faceDetected || captureInProgress) return;
-      captureInProgress = true;
+    async function captureFaceLogin() {
+      if (!loginFaceDetected || loginCaptureInProgress) return;
+      loginCaptureInProgress = true;
       const video = document.getElementById('faceVideo');
       const ring = document.getElementById('scanRing');
 
@@ -870,18 +864,18 @@
       document.getElementById('empRevealCard').classList.remove('show');
 
       try {
-        const liveDetection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })).withFaceLandmarks(true).withFaceDescriptor();
+        const liveDetection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptor();
 
         if (!liveDetection) {
           ring.className = 'scan-ring error';
           setFaceStatus('Face clearly capture nahi hua. Dobara try karein.', 'error');
-          resetCaptureState(2000); return;
+          resetLoginCaptureState(2000); return;
         }
 
         if (allFaceDescriptors.length === 0) {
           ring.className = 'scan-ring error';
           setFaceStatus('Face data nahi mila. Admin se contact karein.', 'error');
-          resetCaptureState(2000); return;
+          resetLoginCaptureState(2000); return;
         }
 
         let bestMatch = null; let bestDistance = Infinity; const THRESHOLD = 0.55;
@@ -893,7 +887,7 @@
 
         if (bestMatch && bestDistance <= THRESHOLD) {
           ring.className = 'scan-ring success';
-          clearInterval(faceDetectionInterval);
+          clearInterval(loginDetectionInterval);
           document.getElementById('scanLine').classList.remove('active');
 
           const avatarURL = bestMatch.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(bestMatch.name)}&size=200`;
@@ -908,28 +902,28 @@
             const emp = profileResult.employee;
             if (emp.status !== 'Active') {
               ring.className = 'scan-ring error'; setFaceStatus('Account inactive hai.', 'error');
-              document.getElementById('empRevealCard').classList.remove('show'); captureInProgress = false; return;
+              document.getElementById('empRevealCard').classList.remove('show'); loginCaptureInProgress = false; return;
             }
             currentEmployee = emp;
             sessionStorage.setItem('punchbook_employee', JSON.stringify(currentEmployee));
-            setTimeout(() => { stopCamera(); showApp(); showToast('Welcome back, ' + currentEmployee.name + '! 👋', 'success'); }, 1400);
+            setTimeout(() => { stopLoginCamera(); showApp(); showToast('Welcome back, ' + currentEmployee.name + '! 👋', 'success'); }, 1400);
           }
         } else {
           ring.className = 'scan-ring error';
           setFaceStatus(`Face kisi se match nahi hua. Dobara try karein.`, 'error');
-          resetCaptureState(2200);
+          resetLoginCaptureState(2200);
         }
       } catch (err) {
-        ring.className = 'scan-ring error'; setFaceStatus('Error: ' + err.message, 'error'); resetCaptureState(2000);
+        ring.className = 'scan-ring error'; setFaceStatus('Error: ' + err.message, 'error'); resetLoginCaptureState(2000);
       }
     }
 
-    function resetCaptureState(delay) {
+    function resetLoginCaptureState(delay) {
       setTimeout(() => {
-        captureInProgress = false; document.getElementById('captureBtn').disabled = false;
+        loginCaptureInProgress = false; document.getElementById('captureBtn').disabled = false;
         document.getElementById('scanRing').className = 'scan-ring'; document.getElementById('scanRing').style.borderColor = 'rgba(59,130,246,0.6)';
         setFaceStatus('Camera ko seedha face ke saamne rakhein...', '');
-        if (!faceDetectionInterval || faceDetectionInterval._destroyed) startLiveDetection();
+        if (!loginDetectionInterval || loginDetectionInterval._destroyed) startLoginLiveDetection();
       }, delay);
     }
 
@@ -937,7 +931,7 @@
       return new Promise(async (resolve) => {
         try {
           const img = new Image(); img.crossOrigin = 'anonymous';
-          img.onload = async () => { try { const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 })).withFaceLandmarks(true).withFaceDescriptor(); resolve(detection ? detection.descriptor : null); } catch (e) { resolve(null); } };
+          img.onload = async () => { try { const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 })).withFaceLandmarks().withFaceDescriptor(); resolve(detection ? detection.descriptor : null); } catch (e) { resolve(null); } };
           img.onerror = () => resolve(null);
           let loadUrl = url; if (url.includes('drive.google.com')) { const match = url.match(/[-\w]{25,}/); if (match) loadUrl = `https://drive.google.com/uc?export=view&id=${match[0]}`; }
           img.src = loadUrl; setTimeout(() => resolve(null), 10000);
@@ -950,14 +944,14 @@
       el.textContent = msg; el.className = 'face-status-msg ' + (type || '');
     }
 
-    function stopCamera() {
-      if (faceDetectionInterval) clearInterval(faceDetectionInterval);
-      faceDetectionInterval = null;
-      if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+    function stopLoginCamera() {
+      if (loginDetectionInterval) clearInterval(loginDetectionInterval);
+      loginDetectionInterval = null;
+      if (loginStream) { loginStream.getTracks().forEach(t => t.stop()); loginStream = null; }
     }
 
     function cancelFaceAuth() {
-      stopCamera(); captureInProgress = false; faceDetected = false;
+      stopLoginCamera(); loginCaptureInProgress = false; loginFaceDetected = false;
       document.getElementById('faceStep1').style.display = 'block'; document.getElementById('faceStep2').style.display = 'none';
       document.getElementById('empRevealCard').classList.remove('show');
       const startBtn = document.getElementById('startFaceBtn'); startBtn.disabled = false; startBtn.innerHTML = '<i class="fas fa-camera"></i> Start Face Scan';
@@ -978,8 +972,7 @@
     }
 
     function logout() {
-      stopCamera();
-      stopSettingsCamera(); // <-- Logout hone par bhi camera band
+      stopLoginCamera(); stopSettingsFaceCamera();
       sessionStorage.removeItem('punchbook_employee'); currentEmployee = null;
       document.getElementById('loginPage').style.display = 'flex'; document.getElementById('appContainer').style.display = 'none';
       cancelFaceAuth(); switchLoginMode('face');
